@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Skill Exchange</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="page">
+
+    <img src="/images/geu.jpg" alt="Graphic Era University" class="bg-image">
+
+    <div class="overlay"></div>
+
+    <div class="left-content">
+
+        <div class="brand">
+            <div class="brand-icon">S</div>
+            <span>Campus Skill Exchange</span>
+        </div>
+
+        <div class="hero-text">
+
+            <div class="tag">GRAPHIC ERA UNIVERSITY</div>
+
+            <h1>
+                Learn Skills.<br>
+                <span>Teach Skills.</span><br>
+                Grow Together.
+            </h1>
+
+            <p>
+                A campus platform where students can connect,
+                exchange skills, learn from each other and build
+                meaningful peer learning experiences.
+            </p>
+
+            <div class="features">
+                <div>✦ Learn from Students</div>
+                <div>↗ Share Your Skills</div>
+                <div>◈ Find Your Skill Match</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="auth-card">
+
+        <div class="card-logo">S</div>
+
+        <h2>Campus Skill Exchange</h2>
+
+        <p class="welcome">
+            Connect. Learn. Exchange.
+        </p>
+
+        <div class="auth-options">
+
+            <div class="auth-box">
+
+                <div class="auth-icon">→</div>
+
+                <div class="auth-info">
+                    <h3>Already have an account?</h3>
+                    <p>Login with your existing account</p>
+                </div>
+
+                <a href="{{ url_for('login') }}" class="auth-btn">
+                    Login
+                </a>
+
+            </div>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <div class="auth-box">
+
+                <div class="auth-icon">+</div>
+
+                <div class="auth-info">
+                    <h3>New to Skill Exchange?</h3>
+                    <p>Create your student account</p>
+                </div>
+
+                <a href="{{ url_for('register') }}" class="auth-btn create-btn">
+                    Create Account
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="secure">
+            <span>✓</span>
+            Student-friendly peer learning platform
+        </div>
+
+        <div class="bottom-text">
+            Graphic Era University • Campus Skill Exchange
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
