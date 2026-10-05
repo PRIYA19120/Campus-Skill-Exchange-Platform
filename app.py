@@ -9,11 +9,11 @@ def home():
 
 @app.route("/login")
 def login():
-    return "Login Page"
+    return render_template("login.html")
 
 @app.route("/register")
 def register():
-    return "Create Account Page"
+    return render_template("register.html")
 
 @app.route("/images/<filename>")
 def images(filename):

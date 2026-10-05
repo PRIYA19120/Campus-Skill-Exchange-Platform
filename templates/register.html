@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="register-page">
+
+    <div class="register-card">
+
+        <h1>Create Account</h1>
+
+        <p class="register-subtitle">
+            Join Campus Skill Exchange
+        </p>
+
+        <form>
+
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text"
+                       placeholder="Enter your full name"
+                       required>
+            </div>
+
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text"
+                       placeholder="Create a username"
+                       required>
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email"
+                       placeholder="Enter your email"
+                       required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password"
+                       placeholder="Create a password"
+                       required>
+            </div>
+
+            <div class="input-group">
+                <label>Confirm Password</label>
+                <input type="password"
+                       placeholder="Confirm your password"
+                       required>
+            </div>
+
+           <div class="input-group">
+    <label>Course / Department</label>
+
+    <select required>
+        <option value="">Select Department</option>
+        <option>BCA</option>
+        <option>BCA AI & Data Science</option>
+        <option>B.Tech Computer Science</option>
+        <option>B.Tech AI & Data Science</option>
+        <option>B.Tech Information Technology</option>
+        <option>B.Tech Electronics & Communication</option>
+        <option>B.Tech Mechanical Engineering</option>
+        <option>B.Tech Civil Engineering</option>
+        <option>BBA</option>
+        <option>B.Com</option>
+        <option>MCA</option>
+        <option>MBA</option>
+        <option>Other</option>
+    </select>
+</div>
+
+            <div class="input-group">
+    <label>Semester</label>
+
+    <select required>
+        <option value="">Select Semester</option>
+        <option>1st Semester</option>
+        <option>2nd Semester</option>
+        <option>3rd Semester</option>
+        <option>4th Semester</option>
+        <option>5th Semester</option>
+        <option>6th Semester</option>
+        <option>7th Semester</option>
+        <option>8th Semester</option>
+    </select>
+</div>
+
+            <button type="submit">
+                Create Account
+            </button>
+
+        </form>
+
+        <p class="login-text">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login</a>
+        </p>
+
+        <a href="{{ url_for('home') }}" class="back-home">
+            ← Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
