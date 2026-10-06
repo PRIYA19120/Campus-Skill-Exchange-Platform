@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Skills | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-box">S</div>
+
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('profile') }}">
+                <span>◉</span>
+                Profile
+            </a>
+
+            <a href="{{ url_for('my_skills') }}" class="active">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="#">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="#">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="#">
+                <span>🎯</span>
+                Match Results
+            </a>
+
+            <a href="#">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+
+            <a href="#">
+                <span>⭐</span>
+                Rating & Feedback
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}">
+                ← Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="dashboard-content">
+
+        <div class="profile-header">
+
+            <div>
+
+                <p class="small-title">
+                    SKILL MANAGEMENT
+                </p>
+
+                <h1>My Skills</h1>
+
+                <p>
+                    Add and manage the skills you can teach to other students.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="skills-main-card">
+
+            <div class="skills-card-header">
+
+                <div>
+
+                    <h2>Skills I Can Teach</h2>
+
+                    <p>
+                        Share your knowledge and help other students learn.
+                    </p>
+
+                </div>
+
+                <button
+                    onclick="document.getElementById('skillForm').style.display='block'">
+
+                    + Add New Skill
+
+                </button>
+
+            </div>
+
+
+            <div id="skillForm" class="add-skill-form">
+
+                <form
+                    action="{{ url_for('my_skills') }}"
+                    method="POST">
+
+                    <label>
+                        Skill Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="skill"
+                        placeholder="Example: Python"
+                        required>
+
+                    <div class="skill-form-buttons">
+
+                        <button type="submit">
+                            Add Skill
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="document.getElementById('skillForm').style.display='none'">
+
+                            Cancel
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div class="skills-grid">
+
+                {% if skills %}
+
+                    {% for skill in skills %}
+
+                    <div class="skill-item">
+
+                        <div class="skill-icon">
+                            ◆
+                        </div>
+
+                        <div class="skill-info">
+
+                            <h3>
+                                {{ skill }}
+                            </h3>
+
+                            <span>
+                                Can Teach
+                            </span>
+
+                        </div>
+
+                        <a
+                            href="{{ url_for('remove_skill', skill=skill) }}"
+                            class="remove-skill">
+
+                            Remove
+
+                        </a>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-skills">
+
+                        <div class="empty-icon">
+                            ◆
+                        </div>
+
+                        <h3>
+                            No skills added yet
+                        </h3>
+
+                        <p>
+                            Add your first skill to start teaching other students.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

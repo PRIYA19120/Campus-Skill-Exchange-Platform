@@ -45,10 +45,10 @@
                 Profile
             </a>
 
-            <a href="#">
-                <span>◆</span>
-                My Skills
-            </a>
+            <a href="{{ url_for('my_skills') }}">
+    <span>◆</span>
+    My Skills
+</a>
 
             <a href="#">
                 <span>📚</span>
@@ -91,6 +91,7 @@
 
     <main class="dashboard-content">
 
+
         <div class="profile-header">
 
             <div>
@@ -107,78 +108,118 @@
 
             </div>
 
-           <a href="{{ url_for('edit_profile') }}"
-   class="edit-profile-btn">
-    Edit Profile
-</a>
+
+            <a href="{{ url_for('edit_profile') }}"
+               class="edit-profile-btn">
+
+                Edit Profile
+
+            </a>
 
         </div>
 
 
+
         <div class="profile-card">
+
 
             <div class="profile-top">
 
+
                 <div class="large-profile-circle">
-                    P
+
+                    {% if profile_picture %}
+
+                        <img
+                            src="{{ url_for('uploaded_file', filename=profile_picture) }}"
+                            alt="Profile Picture">
+
+                    {% else %}
+
+                        {{ full_name[0]|upper if full_name else "P" }}
+
+                    {% endif %}
+
                 </div>
+
 
                 <div class="profile-name">
 
-                    <h2>Student Name</h2>
+                    <h2>
+                        {{ full_name or "Student Name" }}
+                    </h2>
 
-                    <p>@username</p>
+                    <p>
+                        @{{ username or "username" }}
+                    </p>
 
                 </div>
 
             </div>
 
 
+
             <div class="profile-details">
+
 
                 <div class="profile-detail">
 
                     <span>Full Name</span>
 
-                    <strong>Student Name</strong>
+                    <strong>
+                        {{ full_name or "Not added" }}
+                    </strong>
 
                 </div>
+
 
 
                 <div class="profile-detail">
 
                     <span>Username</span>
 
-                    <strong>@username</strong>
+                    <strong>
+                        @{{ username or "Not added" }}
+                    </strong>
 
                 </div>
+
 
 
                 <div class="profile-detail">
 
                     <span>Email</span>
 
-                    <strong>student@example.com</strong>
+                    <strong>
+                        {{ email or "Not added" }}
+                    </strong>
 
                 </div>
+
 
 
                 <div class="profile-detail">
 
                     <span>Course / Department</span>
 
-                    <strong>BCA AI & Data Science</strong>
+                    <strong>
+                        {{ department or "Not added" }}
+                    </strong>
 
                 </div>
+
 
 
                 <div class="profile-detail">
 
                     <span>Semester</span>
 
-                    <strong>3rd Semester</strong>
+                    <strong>
+                        {{ semester or "Not added" }}
+                    </strong>
 
                 </div>
+
 
 
                 <div class="profile-detail">
@@ -186,40 +227,64 @@
                     <span>Bio</span>
 
                     <strong>
-                        Add your bio here
+                        {{ bio or "Add your bio here" }}
                     </strong>
 
                 </div>
 
+
             </div>
+
 
 
             <div class="profile-skills">
 
                 <h3>Profile Overview</h3>
 
+
                 <div class="overview-box">
 
-                    <div>
-                        <strong>0</strong>
-                        <span>Skills I Teach</span>
-                    </div>
 
                     <div>
+
                         <strong>0</strong>
-                        <span>Skills I Want to Learn</span>
+
+                        <span>
+                            Skills I Teach
+                        </span>
+
                     </div>
 
+
                     <div>
+
                         <strong>0</strong>
-                        <span>Completed Exchanges</span>
+
+                        <span>
+                            Skills I Want to Learn
+                        </span>
+
                     </div>
+
+
+                    <div>
+
+                        <strong>0</strong>
+
+                        <span>
+                            Completed Exchanges
+                        </span>
+
+                    </div>
+
 
                 </div>
 
             </div>
 
+
         </div>
+
 
     </main>
 

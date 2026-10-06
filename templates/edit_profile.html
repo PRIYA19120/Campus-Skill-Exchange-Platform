@@ -32,6 +32,7 @@
 
         </div>
 
+
         <nav>
 
             <a href="{{ url_for('dashboard') }}">
@@ -76,6 +77,7 @@
 
         </nav>
 
+
         <div class="sidebar-bottom">
 
             <a href="{{ url_for('home') }}">
@@ -110,20 +112,39 @@
 
         <div class="edit-profile-card">
 
-            <form>
+            <form
+                action="{{ url_for('edit_profile') }}"
+                method="POST"
+                enctype="multipart/form-data">
+
 
                 <div class="profile-picture-section">
 
                     <div class="edit-profile-circle">
-                        P
+
+                        {% if profile_picture %}
+
+                            <img
+                                src="{{ url_for('uploaded_file', filename=profile_picture) }}"
+                                alt="Profile Picture">
+
+                        {% else %}
+
+                            {{ full_name[0]|upper if full_name else "P" }}
+
+                        {% endif %}
+
                     </div>
+
 
                     <div>
 
                         <h3>Profile Picture</h3>
 
-                        <input type="file"
-                               accept="image/*">
+                        <input
+                            type="file"
+                            name="profile_picture"
+                            accept="image/*">
 
                     </div>
 
@@ -132,12 +153,17 @@
 
                 <div class="edit-form-grid">
 
+
                     <div class="edit-input-group">
 
                         <label>Full Name</label>
 
-                        <input type="text"
-                               placeholder="Enter your full name">
+                        <input
+                            type="text"
+                            name="full_name"
+                            value="{{ full_name }}"
+                            placeholder="Enter your full name"
+                            required>
 
                     </div>
 
@@ -146,8 +172,12 @@
 
                         <label>Username</label>
 
-                        <input type="text"
-                               placeholder="Enter your username">
+                        <input
+                            type="text"
+                            name="username"
+                            value="{{ username }}"
+                            placeholder="Enter your username"
+                            required>
 
                     </div>
 
@@ -156,8 +186,12 @@
 
                         <label>Email</label>
 
-                        <input type="email"
-                               placeholder="Enter your email">
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ email }}"
+                            placeholder="Enter your email"
+                            required>
 
                     </div>
 
@@ -166,21 +200,76 @@
 
                         <label>Course / Department</label>
 
-                        <select>
+                        <select name="department" required>
 
-                            <option>BCA</option>
-                            <option>BCA AI & Data Science</option>
-                            <option>B.Tech Computer Science</option>
-                            <option>B.Tech AI & Data Science</option>
-                            <option>B.Tech Information Technology</option>
-                            <option>B.Tech Electronics & Communication</option>
-                            <option>B.Tech Mechanical Engineering</option>
-                            <option>B.Tech Civil Engineering</option>
-                            <option>BBA</option>
-                            <option>B.Com</option>
-                            <option>MCA</option>
-                            <option>MBA</option>
-                            <option>Other</option>
+                            <option value="">
+                                Select Department
+                            </option>
+
+                            <option value="BCA"
+                                {% if department == "BCA" %}selected{% endif %}>
+                                BCA
+                            </option>
+
+                            <option value="BCA AI & Data Science"
+                                {% if department == "BCA AI & Data Science" %}selected{% endif %}>
+                                BCA AI & Data Science
+                            </option>
+
+                            <option value="B.Tech Computer Science"
+                                {% if department == "B.Tech Computer Science" %}selected{% endif %}>
+                                B.Tech Computer Science
+                            </option>
+
+                            <option value="B.Tech AI & Data Science"
+                                {% if department == "B.Tech AI & Data Science" %}selected{% endif %}>
+                                B.Tech AI & Data Science
+                            </option>
+
+                            <option value="B.Tech Information Technology"
+                                {% if department == "B.Tech Information Technology" %}selected{% endif %}>
+                                B.Tech Information Technology
+                            </option>
+
+                            <option value="B.Tech Electronics & Communication"
+                                {% if department == "B.Tech Electronics & Communication" %}selected{% endif %}>
+                                B.Tech Electronics & Communication
+                            </option>
+
+                            <option value="B.Tech Mechanical Engineering"
+                                {% if department == "B.Tech Mechanical Engineering" %}selected{% endif %}>
+                                B.Tech Mechanical Engineering
+                            </option>
+
+                            <option value="B.Tech Civil Engineering"
+                                {% if department == "B.Tech Civil Engineering" %}selected{% endif %}>
+                                B.Tech Civil Engineering
+                            </option>
+
+                            <option value="BBA"
+                                {% if department == "BBA" %}selected{% endif %}>
+                                BBA
+                            </option>
+
+                            <option value="B.Com"
+                                {% if department == "B.Com" %}selected{% endif %}>
+                                B.Com
+                            </option>
+
+                            <option value="MCA"
+                                {% if department == "MCA" %}selected{% endif %}>
+                                MCA
+                            </option>
+
+                            <option value="MBA"
+                                {% if department == "MBA" %}selected{% endif %}>
+                                MBA
+                            </option>
+
+                            <option value="Other"
+                                {% if department == "Other" %}selected{% endif %}>
+                                Other
+                            </option>
 
                         </select>
 
@@ -191,16 +280,51 @@
 
                         <label>Semester</label>
 
-                        <select>
+                        <select name="semester" required>
 
-                            <option>1st Semester</option>
-                            <option>2nd Semester</option>
-                            <option>3rd Semester</option>
-                            <option>4th Semester</option>
-                            <option>5th Semester</option>
-                            <option>6th Semester</option>
-                            <option>7th Semester</option>
-                            <option>8th Semester</option>
+                            <option value="">
+                                Select Semester
+                            </option>
+
+                            <option value="1st Semester"
+                                {% if semester == "1st Semester" %}selected{% endif %}>
+                                1st Semester
+                            </option>
+
+                            <option value="2nd Semester"
+                                {% if semester == "2nd Semester" %}selected{% endif %}>
+                                2nd Semester
+                            </option>
+
+                            <option value="3rd Semester"
+                                {% if semester == "3rd Semester" %}selected{% endif %}>
+                                3rd Semester
+                            </option>
+
+                            <option value="4th Semester"
+                                {% if semester == "4th Semester" %}selected{% endif %}>
+                                4th Semester
+                            </option>
+
+                            <option value="5th Semester"
+                                {% if semester == "5th Semester" %}selected{% endif %}>
+                                5th Semester
+                            </option>
+
+                            <option value="6th Semester"
+                                {% if semester == "6th Semester" %}selected{% endif %}>
+                                6th Semester
+                            </option>
+
+                            <option value="7th Semester"
+                                {% if semester == "7th Semester" %}selected{% endif %}>
+                                7th Semester
+                            </option>
+
+                            <option value="8th Semester"
+                                {% if semester == "8th Semester" %}selected{% endif %}>
+                                8th Semester
+                            </option>
 
                         </select>
 
@@ -212,7 +336,8 @@
                         <label>Bio</label>
 
                         <textarea
-                            placeholder="Tell something about yourself..."></textarea>
+                            name="bio"
+                            placeholder="Tell something about yourself...">{{ bio }}</textarea>
 
                     </div>
 
@@ -221,16 +346,23 @@
 
                 <div class="edit-buttons">
 
-                    <a href="{{ url_for('profile') }}"
-                       class="cancel-btn">
+                    <a
+                        href="{{ url_for('profile') }}"
+                        class="cancel-btn">
+
                         Cancel
+
                     </a>
 
+
                     <button type="submit">
+
                         Save Changes
+
                     </button>
 
                 </div>
+
 
             </form>
 
