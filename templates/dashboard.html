@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <div class="logo-box">S</div>
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}" class="active">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+           <a href="{{ url_for('profile') }}">
+    <span>◉</span>
+    Profile
+</a>
+
+            <a href="#">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="#">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="#">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="#">
+                <span>🎯</span>
+                Match Results
+            </a>
+
+            <a href="#">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+
+            <a href="#">
+                <span>⭐</span>
+                Rating & Feedback
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('home') }}">
+                ← Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="dashboard-content">
+
+        <div class="top-bar">
+
+            <div>
+                <p class="small-title">STUDENT DASHBOARD</p>
+
+                <h1>Welcome👋</h1>
+
+                <p>
+                    Explore skills, connect with students and grow together.
+                </p>
+            </div>
+
+           <div class="profile-mini">
+
+    <div class="profile-circle">
+        {{ user_name[0]|upper }}
+    </div>
+
+    <div>
+        <strong>{{ user_name }}</strong>
+        <span>Campus Member</span>
+    </div>
+
+</div>
+
+        </div>
+
+
+        <div class="dashboard-cards">
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">💡</div>
+
+                <h3>My Skills</h3>
+
+                <p>
+                    Add and manage the skills you can teach.
+                </p>
+
+                <a href="#">View Skills →</a>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">📚</div>
+
+                <h3>Learn Skills</h3>
+
+                <p>
+                    Explore the skills you want to learn.
+                </p>
+
+                <a href="#">Explore Skills →</a>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">🤝</div>
+
+                <h3>Learning Partners</h3>
+
+                <p>
+                    Find students with matching skills.
+                </p>
+
+                <a href="#">Find Partners →</a>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">🎯</div>
+
+                <h3>Match Results</h3>
+
+                <p>
+                    Check your skill exchange matches.
+                </p>
+
+                <a href="#">View Matches →</a>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>My Learning Activity</h2>
+
+                    <p>
+                        Keep track of your skill exchange journey.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="activity-grid">
+
+                <div class="activity-box">
+
+                    <span class="activity-number">0</span>
+
+                    <span class="activity-label">
+                        Skills I Teach
+                    </span>
+
+                </div>
+
+
+                <div class="activity-box">
+
+                    <span class="activity-number">0</span>
+
+                    <span class="activity-label">
+                        Skills I Want to Learn
+                    </span>
+
+                </div>
+
+
+                <div class="activity-box">
+
+                    <span class="activity-number">0</span>
+
+                    <span class="activity-label">
+                        Active Exchanges
+                    </span>
+
+                </div>
+
+
+                <div class="activity-box">
+
+                    <span class="activity-number">0</span>
+
+                    <span class="activity-label">
+                        Completed
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>Get Started</h2>
+
+                    <p>
+                        Complete your profile and start exchanging skills.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="get-started">
+
+                <div>
+                    <div class="start-icon">👤</div>
+
+                    <h3>Complete Your Profile</h3>
+
+                    <p>
+                        Add your profile information and skills
+                        to help other students find you.
+                    </p>
+                </div>
+
+                <a href="#">
+                    Complete Profile →
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-box">S</div>
+
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('profile') }}" class="active">
+                <span>◉</span>
+                Profile
+            </a>
+
+            <a href="#">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="#">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="#">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="#">
+                <span>🎯</span>
+                Match Results
+            </a>
+
+            <a href="#">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+
+            <a href="#">
+                <span>⭐</span>
+                Rating & Feedback
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('home') }}">
+                ← Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="dashboard-content">
+
+        <div class="profile-header">
+
+            <div>
+
+                <p class="small-title">
+                    MY PROFILE
+                </p>
+
+                <h1>Profile</h1>
+
+                <p>
+                    Manage your student profile and information.
+                </p>
+
+            </div>
+
+           <a href="{{ url_for('edit_profile') }}"
+   class="edit-profile-btn">
+    Edit Profile
+</a>
+
+        </div>
+
+
+        <div class="profile-card">
+
+            <div class="profile-top">
+
+                <div class="large-profile-circle">
+                    P
+                </div>
+
+                <div class="profile-name">
+
+                    <h2>Student Name</h2>
+
+                    <p>@username</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-details">
+
+                <div class="profile-detail">
+
+                    <span>Full Name</span>
+
+                    <strong>Student Name</strong>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>Username</span>
+
+                    <strong>@username</strong>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>Email</span>
+
+                    <strong>student@example.com</strong>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>Course / Department</span>
+
+                    <strong>BCA AI & Data Science</strong>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>Semester</span>
+
+                    <strong>3rd Semester</strong>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>Bio</span>
+
+                    <strong>
+                        Add your bio here
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-skills">
+
+                <h3>Profile Overview</h3>
+
+                <div class="overview-box">
+
+                    <div>
+                        <strong>0</strong>
+                        <span>Skills I Teach</span>
+                    </div>
+
+                    <div>
+                        <strong>0</strong>
+                        <span>Skills I Want to Learn</span>
+                    </div>
+
+                    <div>
+                        <strong>0</strong>
+                        <span>Completed Exchanges</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

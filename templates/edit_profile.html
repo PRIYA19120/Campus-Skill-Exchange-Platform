@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-box">S</div>
+
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('profile') }}" class="active">
+                <span>◉</span>
+                Profile
+            </a>
+
+            <a href="#">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="#">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="#">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="#">
+                <span>🎯</span>
+                Match Results
+            </a>
+
+            <a href="#">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+
+            <a href="#">
+                <span>⭐</span>
+                Rating & Feedback
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('home') }}">
+                ← Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="dashboard-content">
+
+        <div class="profile-header">
+
+            <div>
+
+                <p class="small-title">
+                    PROFILE SETTINGS
+                </p>
+
+                <h1>Edit Profile</h1>
+
+                <p>
+                    Update your personal information.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="edit-profile-card">
+
+            <form>
+
+                <div class="profile-picture-section">
+
+                    <div class="edit-profile-circle">
+                        P
+                    </div>
+
+                    <div>
+
+                        <h3>Profile Picture</h3>
+
+                        <input type="file"
+                               accept="image/*">
+
+                    </div>
+
+                </div>
+
+
+                <div class="edit-form-grid">
+
+                    <div class="edit-input-group">
+
+                        <label>Full Name</label>
+
+                        <input type="text"
+                               placeholder="Enter your full name">
+
+                    </div>
+
+
+                    <div class="edit-input-group">
+
+                        <label>Username</label>
+
+                        <input type="text"
+                               placeholder="Enter your username">
+
+                    </div>
+
+
+                    <div class="edit-input-group">
+
+                        <label>Email</label>
+
+                        <input type="email"
+                               placeholder="Enter your email">
+
+                    </div>
+
+
+                    <div class="edit-input-group">
+
+                        <label>Course / Department</label>
+
+                        <select>
+
+                            <option>BCA</option>
+                            <option>BCA AI & Data Science</option>
+                            <option>B.Tech Computer Science</option>
+                            <option>B.Tech AI & Data Science</option>
+                            <option>B.Tech Information Technology</option>
+                            <option>B.Tech Electronics & Communication</option>
+                            <option>B.Tech Mechanical Engineering</option>
+                            <option>B.Tech Civil Engineering</option>
+                            <option>BBA</option>
+                            <option>B.Com</option>
+                            <option>MCA</option>
+                            <option>MBA</option>
+                            <option>Other</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="edit-input-group">
+
+                        <label>Semester</label>
+
+                        <select>
+
+                            <option>1st Semester</option>
+                            <option>2nd Semester</option>
+                            <option>3rd Semester</option>
+                            <option>4th Semester</option>
+                            <option>5th Semester</option>
+                            <option>6th Semester</option>
+                            <option>7th Semester</option>
+                            <option>8th Semester</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="edit-input-group full-width">
+
+                        <label>Bio</label>
+
+                        <textarea
+                            placeholder="Tell something about yourself..."></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="edit-buttons">
+
+                    <a href="{{ url_for('profile') }}"
+                       class="cancel-btn">
+                        Cancel
+                    </a>
+
+                    <button type="submit">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
