@@ -1,5 +1,6 @@
 from flask import Flask, render_template, send_from_directory, request, session, redirect, url_for
 import os
+import csv
 
 app = Flask(__name__)
 
@@ -122,6 +123,8 @@ def uploaded_file(filename):
         UPLOAD_FOLDER,
         filename
     )
+
+
 @app.route("/my-skills", methods=["GET", "POST"])
 def my_skills():
 
@@ -142,6 +145,8 @@ def my_skills():
         "my_skills.html",
         skills=skills
     )
+
+
 @app.route("/remove-skill/<skill>")
 def remove_skill(skill):
 
@@ -153,6 +158,83 @@ def remove_skill(skill):
     session["skills"] = skills
 
     return redirect(url_for("my_skills"))
+
+
+@app.route("/learn-skills")
+def learn_skills():
+
+    skills = session.get("learn_skills", [])
+
+    dataset_path = os.path.join(
+        app.root_path,
+        "dataset",
+        "skills_dataset.csv"
+    )
+
+    available_skills = []
+
+    with open(dataset_path, "r", encoding="utf-8-sig") as file:
+
+        reader = csv.DictReader(file)
+
+        for row in reader:
+
+            skill_name = row.get("skill", "").strip()
+            category_name = row.get("category", "").strip()
+
+            if skill_name:
+                available_skills.append({
+                    "skill": skill_name,
+                    "category": category_name
+                })
+
+
+    search = request.args.get("search", "").strip().lower()
+
+
+    if search:
+
+        available_skills = [
+            item
+            for item in available_skills
+            if search in item["skill"].lower()
+            or search in item["category"].lower()
+        ]
+
+
+    return render_template(
+        "learn_skills.html",
+        skills=skills,
+        available_skills=available_skills,
+        search=request.args.get("search", "").strip()
+    )
+@app.route("/add-learn-skill", methods=["POST"])
+def add_learn_skill():
+
+    skill = request.form.get("skill")
+
+    skills = session.get("learn_skills", [])
+
+    if skill and skill not in skills:
+        skills.append(skill)
+
+    session["learn_skills"] = skills
+
+    return redirect(url_for("learn_skills"))
+
+
+@app.route("/remove-learn-skill/<skill>")
+def remove_learn_skill(skill):
+
+    skills = session.get("learn_skills", [])
+
+    if skill in skills:
+        skills.remove(skill)
+
+    session["learn_skills"] = skills
+
+    return redirect(url_for("learn_skills"))
+
 
 @app.route("/images/<filename>")
 def images(filename):
