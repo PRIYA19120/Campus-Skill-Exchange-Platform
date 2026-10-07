@@ -1,6 +1,7 @@
 from flask import Flask, render_template, send_from_directory, request, session, redirect, url_for
 import os
 import csv
+import sqlite3
 
 app = Flask(__name__)
 
@@ -221,6 +222,57 @@ def add_learn_skill():
     session["learn_skills"] = skills
 
     return redirect(url_for("learn_skills"))
+@app.route("/find-learning-partner")
+def find_learning_partner():
+
+    my_learning_skills = session.get("learn_skills", [])
+
+    students = [
+        {
+            "name": "Aarav Sharma",
+            "username": "aarav",
+            "department": "BCA",
+            "semester": "4",
+            "skills": ["Python", "Java", "Data Structures"]
+        },
+        {
+            "name": "Ananya Rawat",
+            "username": "ananya",
+            "department": "BCA",
+            "semester": "3",
+            "skills": ["HTML", "CSS", "JavaScript"]
+        },
+        {
+            "name": "Rohan Singh",
+            "username": "rohan",
+            "department": "BCA",
+            "semester": "5",
+            "skills": ["C++", "Algorithms", "SQL"]
+        }
+    ]
+
+    matching_students = []
+
+    for student in students:
+
+        matched_skills = [
+            skill
+            for skill in student["skills"]
+            if skill in my_learning_skills
+        ]
+
+        if matched_skills:
+
+            matching_students.append({
+                **student,
+                "matched_skills": matched_skills
+            })
+
+    return render_template(
+        "find_learning_partner.html",
+        students=matching_students,
+        my_learning_skills=my_learning_skills
+    )
 
 
 @app.route("/remove-learn-skill/<skill>")

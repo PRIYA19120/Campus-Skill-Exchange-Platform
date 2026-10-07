@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Find Learning Partner | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo-box">S</div>
+
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a href="{{ url_for('dashboard') }}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('profile') }}">
+                <span>◉</span>
+                Profile
+            </a>
+
+            <a href="{{ url_for('my_skills') }}">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="{{ url_for('learn_skills') }}">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="{{ url_for('find_learning_partner') }}"
+               class="active">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="#">
+                <span>🎯</span>
+                Match Results
+            </a>
+
+            <a href="#">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+
+            <a href="#">
+                <span>⭐</span>
+                Rating & Feedback
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}">
+                ← Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-content">
+
+        <div class="profile-header">
+
+            <div>
+
+                <p class="small-title">
+                    CONNECT WITH STUDENTS
+                </p>
+
+                <h1>Find Learning Partner</h1>
+
+                <p>
+                    Find students who can teach the skills you want to learn.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PARTNER CARD -->
+
+        <div class="partner-main-card">
+
+            <div class="skills-card-header">
+
+                <div>
+
+                    <h2>Recommended Learning Partners</h2>
+
+                    <p>
+                        Students matching your learning goals.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if students %}
+
+                <div class="partner-grid">
+
+                    {% for student in students %}
+
+                        <div class="partner-card">
+
+                            <div class="partner-top">
+
+                                <div class="partner-avatar">
+                                    {{ student.name[0] }}
+                                </div>
+
+                                <div class="partner-info">
+
+                                    <h3>
+                                        {{ student.name }}
+                                    </h3>
+
+                                    <span>
+                                        @{{ student.username }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="partner-details">
+
+                                <p>
+                                    <strong>Department:</strong>
+                                    {{ student.department }}
+                                </p>
+
+                                <p>
+                                    <strong>Semester:</strong>
+                                    {{ student.semester }}
+                                </p>
+
+                            </div>
+
+
+                            <div class="matched-section">
+
+                                <span class="matched-title">
+                                    Can teach you
+                                </span>
+
+                                <div class="matched-skills">
+
+                                    {% for skill in student.matched_skills %}
+
+                                        <span class="matched-skill">
+                                            {{ skill }}
+                                        </span>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="send-request-btn">
+
+                                Send Learning Request
+
+                            </button>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-partners">
+
+                    <div class="empty-partner-icon">
+                        🤝
+                    </div>
+
+                    <h3>
+                        No matching partners found
+                    </h3>
+
+                    <p>
+                        Add some skills to your learning goals
+                        to find suitable learning partners.
+                    </p>
+
+                    <a href="{{ url_for('learn_skills') }}"
+                       class="find-skills-btn">
+
+                        Add Learning Skills
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

@@ -1500,3 +1500,152 @@ button:hover {
     color: white;
     border-color: #1877f2;
 }
+/* FIND LEARNING PARTNER */
+
+.partner-main-card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.partner-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    margin-top: 25px;
+}
+
+.partner-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 22px;
+    background: #ffffff;
+    transition: 0.2s ease;
+}
+
+.partner-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.partner-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.partner-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #1877f2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.partner-info h3 {
+    margin: 0 0 4px;
+    font-size: 18px;
+}
+
+.partner-info span {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.partner-details {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 14px 0;
+    margin-bottom: 16px;
+}
+
+.partner-details p {
+    margin: 7px 0;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.matched-title {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.matched-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.matched-skill {
+    background: #eef5ff;
+    color: #1877f2;
+    border-radius: 20px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.send-request-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 9px;
+    background: #1877f2;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.send-request-btn:hover {
+    background: #0d65d9;
+}
+
+.empty-partners {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-partner-icon {
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.empty-partners h3 {
+    margin-bottom: 8px;
+}
+
+.empty-partners p {
+    color: #6b7280;
+    max-width: 450px;
+    margin: 0 auto 20px;
+}
+
+.find-skills-btn {
+    display: inline-block;
+    text-decoration: none;
+    background: #1877f2;
+    color: white;
+    padding: 11px 20px;
+    border-radius: 9px;
+    font-weight: 600;
+}
+
+@media (max-width: 800px) {
+
+    .partner-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
