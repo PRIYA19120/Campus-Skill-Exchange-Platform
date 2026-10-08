@@ -288,6 +288,11 @@ def remove_learn_skill(skill):
 
     return redirect(url_for("learn_skills"))
 
+@app.route("/match-results")
+def match_results():
+    return render_template("match_results.html")
+
+
 
 @app.route("/images/<filename>")
 def images(filename):
