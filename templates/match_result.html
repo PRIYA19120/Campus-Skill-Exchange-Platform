@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Match Results | Campus Skill Exchange</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+```
+
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+```
+<aside class="sidebar">
+
+    <div class="sidebar-logo">
+
+        <div class="logo-box">S</div>
+
+        <div>
+            <h2>Skill Exchange</h2>
+            <span>Campus Platform</span>
+        </div>
+
+    </div>
+
+    <nav>
+
+        <a href="{{ url_for('dashboard') }}">
+            <span>⌂</span>
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('profile') }}">
+            <span>◉</span>
+            Profile
+        </a>
+
+        <a href="{{ url_for('my_skills') }}">
+            <span>◆</span>
+            My Skills
+        </a>
+
+        <a href="{{ url_for('learn_skills') }}">
+            <span>📚</span>
+            Learn Skills
+        </a>
+
+        <a href="{{ url_for('find_learning_partner') }}">
+            <span>🤝</span>
+            Find Learning Partner
+        </a>
+
+        <a href="#" class="active">
+            <span>🎯</span>
+            Match Results
+        </a>
+
+        <a href="#">
+            <span>📊</span>
+            Skill Gap Analysis
+        </a>
+
+        <a href="#">
+            <span>⭐</span>
+            Rating & Feedback
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <a href="{{ url_for('logout') }}">
+            ← Logout
+        </a>
+
+    </div>
+
+</aside>
+
+
+<main class="dashboard-content">
+
+    <div class="profile-header">
+
+        <div>
+
+            <p class="small-title">
+                SMART MATCHING
+            </p>
+
+            <h1>Match Results</h1>
+
+            <p>
+                Students who best match your learning goals.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- YOUR LEARNING GOALS -->
+
+    <div class="match-summary-card">
+
+        <div>
+
+            <h2>Your Learning Goals</h2>
+
+            <p>
+                Based on the skills you want to learn.
+            </p>
+
+        </div>
+
+        <div class="goal-skills">
+
+            <span>Python</span>
+            <span>Machine Learning</span>
+            <span>SQL</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- MATCH RESULTS -->
+
+    <div class="match-results-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>Recommended Partners</h2>
+
+                <p>
+                    Students who can help you learn your selected skills.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="match-results-grid">
+
+
+            <!-- MATCH CARD 1 -->
+
+            <div class="match-card">
+
+                <div class="match-card-top">
+
+                    <div class="student-avatar">
+                        AS
+                    </div>
+
+                    <div class="student-details">
+
+                        <h3>
+                            Aarav Sharma
+                        </h3>
+
+                        <span>
+                            Computer Science • Semester 4
+                        </span>
+
+                    </div>
+
+                    <div class="match-percentage">
+                        92%
+                        <small>Match</small>
+                    </div>
+
+                </div>
+
+
+                <div class="matched-skills">
+
+                    <p>
+                        Can Teach
+                    </p>
+
+                    <div>
+
+                        <span>Python</span>
+                        <span>Pandas</span>
+                        <span>Machine Learning</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="match-reason">
+
+                    <span>✓</span>
+
+                    <p>
+                        Strong match with your learning goals.
+                    </p>
+
+                </div>
+
+
+                <div class="match-actions">
+
+                    <a href="#" class="view-profile-btn">
+                        View Profile
+                    </a>
+
+                    <a href="#" class="connect-btn">
+                        Connect
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- MATCH CARD 2 -->
+
+            <div class="match-card">
+
+                <div class="match-card-top">
+
+                    <div class="student-avatar">
+                        AR
+                    </div>
+
+                    <div class="student-details">
+
+                        <h3>
+                            Ananya Rawat
+                        </h3>
+
+                        <span>
+                            Information Technology • Semester 3
+                        </span>
+
+                    </div>
+
+                    <div class="match-percentage">
+                        86%
+                        <small>Match</small>
+                    </div>
+
+                </div>
+
+
+                <div class="matched-skills">
+
+                    <p>
+                        Can Teach
+                    </p>
+
+                    <div>
+
+                        <span>SQL</span>
+                        <span>Python</span>
+                        <span>Data Science</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="match-reason">
+
+                    <span>✓</span>
+
+                    <p>
+                        Matches multiple skills you want to learn.
+                    </p>
+
+                </div>
+
+
+                <div class="match-actions">
+
+                    <a href="#" class="view-profile-btn">
+                        View Profile
+                    </a>
+
+                    <a href="#" class="connect-btn">
+                        Connect
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- MATCH CARD 3 -->
+
+            <div class="match-card">
+
+                <div class="match-card-top">
+
+                    <div class="student-avatar">
+                        RK
+                    </div>
+
+                    <div class="student-details">
+
+                        <h3>
+                            Rohan Kumar
+                        </h3>
+
+                        <span>
+                            Computer Applications • Semester 4
+                        </span>
+
+                    </div>
+
+                    <div class="match-percentage">
+                        78%
+                        <small>Match</small>
+                    </div>
+
+                </div>
+
+
+                <div class="matched-skills">
+
+                    <p>
+                        Can Teach
+                    </p>
+
+                    <div>
+
+                        <span>SQL</span>
+                        <span>Python</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="match-reason">
+
+                    <span>✓</span>
+
+                    <p>
+                        Good match based on your selected skills.
+                    </p>
+
+                </div>
+
+
+                <div class="match-actions">
+
+                    <a href="#" class="view-profile-btn">
+                        View Profile
+                    </a>
+
+                    <a href="#" class="connect-btn">
+                        Connect
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</main>
+```
+
+</div>
+
+</body>
+
+</html>
