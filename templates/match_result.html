@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Results | Campus Skill Exchange</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .match-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .match-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .match-header h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .match-header p {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .match-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: 0.3s;
+            border: 1px solid #eeeeee;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .profile-circle {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .match-card h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .department {
+            text-align: center;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .skill-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .skill {
+            background: #f0edff;
+            color: #5b45b5;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .match-score {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .connect-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .connect-btn:hover {
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 25px;
+            text-decoration: none;
+            color: #5b45b5;
+            font-weight: 600;
+        }
+
+        .no-match {
+            text-align: center;
+            background: white;
+            padding: 50px 20px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        @media (max-width: 600px) {
+            .match-header h1 {
+                font-size: 27px;
+            }
+
+            .match-container {
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="match-container">
+
+    <a href="{{ url_for('find_learning_partner') }}" class="back-btn">
+        ← Back to Find Learning Partner
+    </a>
+
+    <div class="match-header">
+        <h1>Learning Partner Matches</h1>
+        <p>Students who match your learning and teaching interests</p>
+    </div>
+
+    {% if matches %}
+
+    <div class="match-grid">
+
+        {% for match in matches %}
+
+        <div class="match-card">
+
+            <div class="profile-circle">
+                {{ match.name[0] | upper }}
+            </div>
+
+            <h2>{{ match.name }}</h2>
+
+            <div class="department">
+                {{ match.department }} · Semester {{ match.semester }}
+            </div>
+
+            <div class="match-score">
+                <div class="score-circle">
+                    {{ match.match_score }}%
+                </div>
+            </div>
+
+            <div class="skill-title">
+                Skills
+            </div>
+
+            <div class="skill-list">
+
+                {% for skill in match.skills %}
+
+                <span class="skill">
+                    {{ skill }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="#" class="connect-btn">
+                Connect
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="no-match">
+        <h2>No Matches Found</h2>
+        <p>Try selecting different skills to find suitable learning partners.</p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
