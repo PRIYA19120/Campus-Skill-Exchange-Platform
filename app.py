@@ -32,18 +32,69 @@ def login():
     return render_template("login.html")
 
 
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
     if request.method == "POST":
 
-        session["full_name"] = request.form.get("full_name")
-        session["username"] = request.form.get("username")
-        session["email"] = request.form.get("email")
-        session["department"] = request.form.get("department")
-        session["semester"] = request.form.get("semester")
+        full_name = request.form.get("full_name", "").strip()
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+        department = request.form.get("department", "")
+        semester = request.form.get("semester", "")
 
-        session["user_name"] = session["full_name"]
+        if not all([full_name, username, email, password]):
+            return render_template(
+                "register.html",
+                error="Please fill in all required fields."
+            )
+
+        if password != confirm_password:
+            return render_template(
+                "register.html",
+                error="Passwords do not match."
+            )
+
+        conn = get_db()
+
+        try:
+            conn.execute(
+                """
+                INSERT INTO users
+                (full_name, username, email, password, department, semester)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    full_name,
+                    username,
+                    email,
+                    password,
+                    department,
+                    semester
+                )
+            )
+
+            conn.commit()
+
+        except sqlite3.IntegrityError:
+            return render_template(
+                "register.html",
+                error="Username or email already exists."
+            )
+
+        finally:
+            conn.close()
+
+        session["user_id"] = None
+        session["full_name"] = full_name
+        session["username"] = username
+        session["email"] = email
+        session["department"] = department
+        session["semester"] = semester
+        session["user_name"] = full_name
 
         return redirect(url_for("dashboard"))
 
@@ -288,9 +339,9 @@ def remove_learn_skill(skill):
 
     return redirect(url_for("learn_skills"))
 
-@app.route("/match-results")
-def match_results():
-    return render_template("match_results.html")
+@app.route("/match-result")
+def match_result():
+    return render_template("match_result.html")
 
 
 

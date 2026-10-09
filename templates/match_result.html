@@ -1,0 +1,166 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Results | Campus Skill Exchange</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='match_result.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Campus<span>Connect.</span></div>
+
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="my_skills.html">My Skills</a>
+            <a href="learn_skills.html">Learn Skills</a>
+            <a href="match_result.html" class="active">Matches</a>
+            <div class="profile-icon">P</div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <section class="welcome">
+            <span class="tag">YOUR LEARNING NETWORK</span>
+            <h1>Find Your Perfect Skill Match</h1>
+            <p>Connect with fellow students, exchange knowledge,<br>
+            and grow together through peer learning.</p>
+        </section>
+
+        <div class="section-heading">
+            <h2>Potential Learning Partners</h2>
+            <span class="count">4 Profiles</span>
+        </div>
+
+        <div class="filters">
+            <input type="search" placeholder="Search by name or skill...">
+            <button type="button">All Skills &#9662;</button>
+        </div>
+
+        <section class="match-grid">
+
+            <article class="match-card">
+                <div class="card-top">
+                    <div class="avatar">A</div>
+                    <div class="student-info">
+                        <h3>Aarav Sharma</h3>
+                        <p>BCA · Semester 3</p>
+                    </div>
+                    <span class="match-badge">95% Match</span>
+                </div>
+
+                <p class="skill-title">Can teach you</p>
+                <div class="skills">
+                    <span class="skill">Python</span>
+                    <span class="skill">Data Structures</span>
+                </div>
+
+                <p class="skill-title">Wants to learn</p>
+                <div class="skills">
+                    <span class="skill other">Web Development</span>
+                    <span class="skill other">CSS</span>
+                </div>
+
+                <div class="card-bottom">
+                    <span class="availability">Peer Learning</span>
+                    <a href="#" class="view-btn">View Profile &#8599;</a>
+                </div>
+            </article>
+
+            <article class="match-card">
+                <div class="card-top">
+                    <div class="avatar blue">S</div>
+                    <div class="student-info">
+                        <h3>Simran Kapoor</h3>
+                        <p>BCA · Semester 4</p>
+                    </div>
+                    <span class="match-badge">90% Match</span>
+                </div>
+
+                <p class="skill-title">Can teach you</p>
+                <div class="skills">
+                    <span class="skill">HTML</span>
+                    <span class="skill">CSS</span>
+                </div>
+
+                <p class="skill-title">Wants to learn</p>
+                <div class="skills">
+                    <span class="skill other">Python</span>
+                    <span class="skill other">Pandas</span>
+                </div>
+
+                <div class="card-bottom">
+                    <span class="availability">Peer Learning</span>
+                    <a href="#" class="view-btn">View Profile &#8599;</a>
+                </div>
+            </article>
+
+            <article class="match-card">
+                <div class="card-top">
+                    <div class="avatar pink">R</div>
+                    <div class="student-info">
+                        <h3>Riya Verma</h3>
+                        <p>BCA · Semester 3</p>
+                    </div>
+                    <span class="match-badge">85% Match</span>
+                </div>
+
+                <p class="skill-title">Can teach you</p>
+                <div class="skills">
+                    <span class="skill">C Programming</span>
+                    <span class="skill">DSA</span>
+                </div>
+
+                <p class="skill-title">Wants to learn</p>
+                <div class="skills">
+                    <span class="skill other">Python</span>
+                    <span class="skill other">AI Basics</span>
+                </div>
+
+                <div class="card-bottom">
+                    <span class="availability">Peer Learning</span>
+                    <a href="#" class="view-btn">View Profile &#8599;</a>
+                </div>
+            </article>
+
+            <article class="match-card">
+                <div class="card-top">
+                    <div class="avatar green">V</div>
+                    <div class="student-info">
+                        <h3>Vedant Singh</h3>
+                        <p>BCA · Semester 2</p>
+                    </div>
+                    <span class="match-badge">82% Match</span>
+                </div>
+
+                <p class="skill-title">Can teach you</p>
+                <div class="skills">
+                    <span class="skill">Python</span>
+                    <span class="skill">NumPy</span>
+                </div>
+
+                <p class="skill-title">Wants to learn</p>
+                <div class="skills">
+                    <span class="skill other">C Programming</span>
+                    <span class="skill other">DSA</span>
+                </div>
+
+                <div class="card-bottom">
+                    <span class="availability">Peer Learning</span>
+                    <a href="#" class="view-btn">View Profile &#8599;</a>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+    <footer class="footer">
+        Campus Skill Exchange · Learn Together, Grow Together
+    </footer>
+
+</body>
+</html>
+```
