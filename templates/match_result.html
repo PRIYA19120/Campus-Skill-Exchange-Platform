@@ -5,18 +5,400 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match Results | Campus Skill Exchange</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='match_result.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7ff;
+            color: #17213b;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            min-height: 76px;
+            background: white;
+            padding: 18px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e8edfa;
+            box-shadow: 0 3px 15px rgba(30, 50, 100, 0.04);
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+            color: #192a56;
+            white-space: nowrap;
+        }
+
+        .logo span {
+            color: #4263eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #65708a;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #4263eb;
+        }
+
+        .profile-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #4263eb;
+            color: white;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 45px auto;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #172b65, #4263eb);
+            color: white;
+            padding: 42px;
+            border-radius: 22px;
+            margin-bottom: 38px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            border: 35px solid rgba(255,255,255,0.08);
+            right: -55px;
+            top: -75px;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 800;
+            color: #dbe5ff;
+            margin-bottom: 14px;
+        }
+
+        .welcome h1 {
+            font-size: clamp(27px, 4vw, 38px);
+            margin-bottom: 13px;
+            line-height: 1.2;
+        }
+
+        .welcome p {
+            color: #e1e8ff;
+            font-size: 15px;
+            line-height: 1.8;
+            max-width: 580px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .section-heading h2 {
+            font-size: 24px;
+            color: #192a56;
+        }
+
+        .count {
+            background: #e8edff;
+            color: #3558d4;
+            padding: 9px 15px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 27px;
+        }
+
+        .filters input {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 17px;
+            border: 1px solid #dfe5f2;
+            background: white;
+            border-radius: 10px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .filters input:focus {
+            border-color: #4263eb;
+            box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.1);
+        }
+
+        .filters button {
+            padding: 13px 18px;
+            background: white;
+            color: #33415c;
+            border: 1px solid #dfe5f2;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .match-card {
+            background: white;
+            padding: 26px;
+            border: 1px solid #e9edf7;
+            border-radius: 18px;
+            box-shadow: 0 7px 25px rgba(29, 48, 95, 0.05);
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 32px rgba(29, 48, 95, 0.10);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 27px;
+        }
+
+        .avatar {
+            width: 53px;
+            height: 53px;
+            flex-shrink: 0;
+            border-radius: 16px;
+            background: #e3eaff;
+            color: #3558d4;
+            display: grid;
+            place-items: center;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .avatar.blue {
+            background: #dff2ff;
+            color: #0876b9;
+        }
+
+        .avatar.pink {
+            background: #ffe6f0;
+            color: #d63384;
+        }
+
+        .avatar.green {
+            background: #dcf8e9;
+            color: #13804a;
+        }
+
+        .student-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .student-info h3 {
+            font-size: 17px;
+            margin-bottom: 6px;
+            color: #1d2a49;
+        }
+
+        .student-info p {
+            color: #8992a7;
+            font-size: 12px;
+        }
+
+        .match-badge {
+            background: #e3f9ed;
+            color: #16844b;
+            padding: 8px 10px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .skill-title {
+            color: #69758d;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 19px 0 11px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill {
+            display: inline-block;
+            background: #edf2ff;
+            color: #3558d4;
+            padding: 8px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .skill.other {
+            background: #f1f3f8;
+            color: #626e85;
+        }
+
+        .card-bottom {
+            border-top: 1px solid #edf0f7;
+            margin-top: 25px;
+            padding-top: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .availability {
+            color: #7c879d;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background: #4263eb;
+            padding: 11px 15px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .view-btn:hover {
+            background: #2949ca;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 26px 15px;
+            color: #8b94a8;
+            font-size: 13px;
+            border-top: 1px solid #e7ebf5;
+            margin-top: 55px;
+            background: white;
+        }
+
+        @media (max-width: 800px) {
+            .navbar {
+                padding: 18px 5%;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .container {
+                margin-top: 28px;
+            }
+
+            .match-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome {
+                padding: 30px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .section-heading h2 {
+                font-size: 20px;
+            }
+
+            .match-card {
+                padding: 19px;
+            }
+
+            .card-top {
+                flex-wrap: wrap;
+            }
+
+            .match-badge {
+                margin-left: auto;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filters button {
+                align-self: flex-start;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
     <nav class="navbar">
         <div class="logo">Campus<span>Connect.</span></div>
 
         <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="my_skills.html">My Skills</a>
-            <a href="learn_skills.html">Learn Skills</a>
-            <a href="match_result.html" class="active">Matches</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('my_skills') }}">My Skills</a>
+            <a href="{{ url_for('learn_skills') }}">Learn Skills</a>
+            <a href="{{ url_for('match_result') }}" class="active">Matches</a>
             <div class="profile-icon">P</div>
         </div>
     </nav>
@@ -26,8 +408,10 @@
         <section class="welcome">
             <span class="tag">YOUR LEARNING NETWORK</span>
             <h1>Find Your Perfect Skill Match</h1>
-            <p>Connect with fellow students, exchange knowledge,<br>
-            and grow together through peer learning.</p>
+            <p>
+                Connect with fellow students, exchange knowledge,
+                and grow together through peer learning.
+            </p>
         </section>
 
         <div class="section-heading">
