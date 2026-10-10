@@ -374,6 +374,9 @@ def logout():
     session.clear()
 
     return redirect(url_for("home"))
+@app.route('/skill-gap-analysis')
+def skill_gap_analysis():
+    return render_template('skill_gap_analysis.html')
 
 
 if __name__ == "__main__":
