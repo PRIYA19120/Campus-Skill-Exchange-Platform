@@ -1,7 +1,6 @@
 
 from flask import Blueprint, request,current_app
 from werkzeug.security import generate_password_hash
-hashed_password = generate_password_hash(password)
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash
 
@@ -18,6 +17,7 @@ def register():
     name = data.get("name", "").strip()
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
+    hashed_password = generate_password_hash(password)
     department = data.get("department", "").strip()
     semester = data.get("semester")
 
@@ -30,12 +30,14 @@ def register():
         return {
             "error": "Password must contain at least 8 characters."
         }, 400
+    
+   
 
     try:
         student = Student(
             name=name,
             email=email,
-            password=generate_password_hash(password),
+            password=hashed_password,
             department=department or None,
             semester=int(semester) if semester not in (None, "") else None
         )
@@ -94,5 +96,22 @@ def login():
             "student_id": student.student_id,
             "name": student.name,
             "email": student.email
+        }
+    }, 200
+
+@auth_bp.route("/profile/<int:student_id>", methods=["GET"])
+def get_profile(student_id):
+    student = Student.query.get(student_id)
+
+    if not student:
+        return {"error": "Student not found."}, 404
+
+    return {
+        "student": {
+            "student_id": student.student_id,
+            "name": student.name,
+            "email": student.email,
+            "department": student.department,
+            "semester": student.semester
         }
     }, 200
