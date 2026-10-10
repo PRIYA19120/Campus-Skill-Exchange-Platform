@@ -5,7 +5,9 @@ import sqlite3
 from flask import Flask 
 from database import init_db, db
 import models
-
+from models import Student
+from werkzeug.security import check_password_hash
+from sqlalchemy.exc import IntegrityError
 from routes.auth import auth_bp
 from routes.skills import skills_bp
 
@@ -33,32 +35,38 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
+        email = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
 
-        username = request.form.get("username")
+        student = Student.query.filter_by(email=email).first()
 
-        session["user_name"] = username
-        session["username"] = username
+        if student and check_password_hash(student.password, password):
+            session.clear()
+            session["user_id"] = student.student_id
+            session["user_name"] = student.name
+            session["username"] = student.name
 
-        return redirect(url_for("dashboard"))
+            return redirect(url_for("dashboard"))
+
+        return render_template(
+            "login.html",
+            error="Invalid email or password."
+        )
 
     return render_template("login.html")
 
-
-
 @app.route("/register", methods=["GET", "POST"])
+
 def register():
-
     if request.method == "POST":
-
         full_name = request.form.get("full_name", "").strip()
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
-        department = request.form.get("department", "")
-        semester = request.form.get("semester", "")
+        department = request.form.get("department", "").strip()
+        semester_value = request.form.get("semester", "").strip()
 
         if not all([full_name, username, email, password]):
             return render_template(
@@ -72,47 +80,65 @@ def register():
                 error="Passwords do not match."
             )
 
-        conn = get_db()
+        existing_student = Student.query.filter(
+            (Student.email == email)
+        ).first()
 
-        try:
-            conn.execute(
-                """
-                INSERT INTO users
-                (full_name, username, email, password, department, semester)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    full_name,
-                    username,
-                    email,
-                    password,
-                    department,
-                    semester
-                )
-            )
-
-            conn.commit()
-
-        except sqlite3.IntegrityError:
+        if existing_student:
             return render_template(
                 "register.html",
-                error="Username or email already exists."
+                error="Email already exists. Please log in."
             )
 
-        finally:
-            conn.close()
+        try:
+            semester = int(semester_value) if semester_value else None
+            if semester is not None and semester < 1:
+                raise ValueError
+        except ValueError:
+            return render_template(
+                "register.html",
+                error="Please enter a valid semester."
+            )
 
-        session["user_id"] = None
-        session["full_name"] = full_name
-        session["username"] = username
-        session["email"] = email
-        session["department"] = department
-        session["semester"] = semester
-        session["user_name"] = full_name
+        student = Student(
+            name=full_name,
+            email=email,
+            password=generate_password_hash(password),
+            department=department or None,
+            semester=semester
+        )
 
-        return redirect(url_for("dashboard"))
+        try:
+            db.session.add(student)
+            db.session.commit()
+
+            session["user_id"] = student.student_id
+            session["full_name"] = student.name
+            session["username"] = username
+            session["email"] = student.email
+            session["department"] = student.department
+            session["semester"] = student.semester
+            session["user_name"] = student.name
+
+            return redirect(url_for("dashboard"))
+
+        except IntegrityError:
+            db.session.rollback()
+            return render_template(
+                "register.html",
+                error="This email already exists."
+            )
+
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Registration failed")
+            return render_template(
+                "register.html",
+                error="Account creation failed. Check the server terminal."
+            )
 
     return render_template("register.html")
+
 
 
 @app.route("/dashboard")
