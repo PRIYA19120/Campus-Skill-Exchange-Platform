@@ -2,14 +2,28 @@ from flask import Flask, render_template, send_from_directory, request, session,
 import os
 import csv
 import sqlite3
+from flask import Flask 
+from database import init_db, db
+import models
 
+from routes.auth import auth_bp
+from routes.skills import skills_bp
 
 app = Flask(__name__)
+
+
 
 app.secret_key = "campus_skill_exchange"
 
 UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+# Initialize MySQL and register API blueprints
+init_db(app)
+
+app.register_blueprint(auth_bp)
+app.register_blueprint(skills_bp)
 
 
 @app.route("/")
