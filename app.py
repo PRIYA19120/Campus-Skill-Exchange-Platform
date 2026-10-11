@@ -5,27 +5,18 @@ import sqlite3
 from flask import Flask 
 from database import init_db, db
 import models
-from models import Student
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
+from models import Student
 from routes.auth import auth_bp
 from routes.skills import skills_bp
 
 app = Flask(__name__)
 
-
-
 app.secret_key = "campus_skill_exchange"
 
 UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-
-# Initialize MySQL and register API blueprints
-init_db(app)
-
-app.register_blueprint(auth_bp)
-app.register_blueprint(skills_bp)
 
 
 @app.route("/")
@@ -35,38 +26,32 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     if request.method == "POST":
-        email = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
 
-        student = Student.query.filter_by(email=email).first()
+        username = request.form.get("username")
 
-        if student and check_password_hash(student.password, password):
-            session.clear()
-            session["user_id"] = student.student_id
-            session["user_name"] = student.name
-            session["username"] = student.name
+        session["user_name"] = username
+        session["username"] = username
 
-            return redirect(url_for("dashboard"))
-
-        return render_template(
-            "login.html",
-            error="Invalid email or password."
-        )
+        return redirect(url_for("dashboard"))
 
     return render_template("login.html")
 
-@app.route("/register", methods=["GET", "POST"])
 
+
+@app.route("/register", methods=["GET", "POST"])
 def register():
+
     if request.method == "POST":
+
         full_name = request.form.get("full_name", "").strip()
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
-        department = request.form.get("department", "").strip()
-        semester_value = request.form.get("semester", "").strip()
+        department = request.form.get("department", "")
+        semester = request.form.get("semester", "")
 
         if not all([full_name, username, email, password]):
             return render_template(
@@ -80,38 +65,30 @@ def register():
                 error="Passwords do not match."
             )
 
-        existing_student = Student.query.filter(
-            (Student.email == email)
-        ).first()
+       
+        try:
+            existing_student = Student.query.filter(
+                (Student.email == email)
+            ).first()
 
-        if existing_student:
-            return render_template(
-                "register.html",
-                error="Email already exists. Please log in."
+            if existing_student:
+                return render_template(
+                    "register.html",
+                    error="Email already exists. Please log in."
+                )
+
+            student = Student(
+                name=full_name,
+                email=email,
+                password=generate_password_hash(password),
+                department=department or None,
+                semester=semester
             )
 
-        try:
-            semester = int(semester_value) if semester_value else None
-            if semester is not None and semester < 1:
-                raise ValueError
-        except ValueError:
-            return render_template(
-                "register.html",
-                error="Please enter a valid semester."
-            )
-
-        student = Student(
-            name=full_name,
-            email=email,
-            password=generate_password_hash(password),
-            department=department or None,
-            semester=semester
-        )
-
-        try:
             db.session.add(student)
             db.session.commit()
 
+            session.clear()
             session["user_id"] = student.student_id
             session["full_name"] = student.name
             session["username"] = username
@@ -126,7 +103,7 @@ def register():
             db.session.rollback()
             return render_template(
                 "register.html",
-                error="This email already exists."
+                error="Username or email already exists."
             )
 
         except Exception:
@@ -134,11 +111,13 @@ def register():
             app.logger.exception("Registration failed")
             return render_template(
                 "register.html",
-                error="Account creation failed. Check the server terminal."
+                error="Account creation failed. Check the terminal."
             )
 
-    return render_template("register.html")
 
+       
+
+    return render_template("register.html")
 
 
 @app.route("/dashboard")
@@ -404,6 +383,41 @@ def logout():
 def skill_gap_analysis():
     return render_template('skill_gap_analysis.html')
 
+
+
+# Initialize the MySQL database connection
+init_db(app)
+
+# Register blueprints
+app.register_blueprint(auth_bp)
+app.register_blueprint(skills_bp)
+
+
+
+
+
+@app.route("/test-db")
+def test_db():
+    try:
+        with db.engine.connect() as connection:
+            connection.exec_driver_sql("SELECT 1")
+
+        return {"message": "MySQL database connected successfully!"}, 200
+
+    except Exception as e:
+        app.logger.exception("Database connection failed")
+        return {"error": "Database connection failed. Check server logs."}, 500
+
+
+@app.route("/create-tables")
+def create_tables():
+    try:
+        with app.app_context():
+            db.create_all()
+        return {"message": "All database tables created successfully!"}, 200
+    except Exception:
+        app.logger.exception("Table creation failed")
+        return {"error": "Table creation failed. Check server logs."}, 500
 
 if __name__ == "__main__":
     app.run(debug=True)
