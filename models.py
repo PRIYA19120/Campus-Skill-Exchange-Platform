@@ -10,7 +10,7 @@ class Student(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     department = db.Column(db.String(100))
-    semester = db.Column(db.Integer)
+    semester = db.Column(db.String(30))
     bio = db.Column(db.Text)
 
     student_skills = db.relationship(
