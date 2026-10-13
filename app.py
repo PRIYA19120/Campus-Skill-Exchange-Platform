@@ -5,9 +5,9 @@ import sqlite3
 from flask import Flask 
 from database import init_db, db
 import models
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
-from models import Student
+from models import Student, Skill, StudentSkill
 from routes.auth import auth_bp
 from routes.skills import skills_bp
 
@@ -24,19 +24,43 @@ def home():
     return render_template("index.html")
 
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
     if request.method == "POST":
 
-        username = request.form.get("username")
+        email = request.form.get("username", "").strip().lower()
+        password = request.form.get("password", "")
 
-        session["user_name"] = username
-        session["username"] = username
+        # Check whether the student exists
+        student = Student.query.filter_by(email=email).first()
+
+        # Verify the password
+        if not student or not check_password_hash(
+            student.password, password
+        ):
+            return render_template(
+                "login.html",
+                error="Invalid email or password."
+            )
+
+        # Clear old session data
+        session.clear()
+
+        # Store logged-in student's details
+        session["user_id"] = student.student_id
+        session["full_name"] = student.name
+        session["user_name"] = student.name
+        session["username"] = student.name
+        session["email"] = student.email
+        session["department"] = student.department or ""
+        session["semester"] = student.semester or ""
 
         return redirect(url_for("dashboard"))
 
     return render_template("login.html")
+
 
 
 
@@ -196,61 +220,118 @@ def uploaded_file(filename):
         filename
     )
 
+def get_student_skills(student_id, skill_type):
+    records = StudentSkill.query.filter_by(
+        student_id=student_id,
+        skill_type=skill_type
+    ).all()
+
+    return [record.skill.skill_name for record in records]
+
+
+def save_student_skill(student_id, skill_name, skill_type):
+    skill_name = skill_name.strip()
+
+    if not skill_name:
+        return
+
+    skill = Skill.query.filter(
+        Skill.skill_name.ilike(skill_name)
+    ).first()
+
+    if not skill:
+        skill = Skill(skill_name=skill_name)
+        db.session.add(skill)
+        db.session.flush()
+
+    existing = StudentSkill.query.filter_by(
+        student_id=student_id,
+        skill_id=skill.skill_id,
+        skill_type=skill_type
+    ).first()
+
+    if not existing:
+        student_skill = StudentSkill(
+            student_id=student_id,
+            skill_id=skill.skill_id,
+            skill_type=skill_type
+        )
+        db.session.add(student_skill)
+
+    db.session.commit()
 
 @app.route("/my-skills", methods=["GET", "POST"])
+@app.route("/my-skills", methods=["GET", "POST"])
 def my_skills():
+    student_id = session.get("user_id")
 
-    skills = session.get("skills", [])
+    if not student_id:
+        return redirect(url_for("login"))
 
     if request.method == "POST":
+        skill_name = request.form.get("skill", "").strip()
 
-        skill = request.form.get("skill")
-
-        if skill and skill not in skills:
-            skills.append(skill)
-
-        session["skills"] = skills
+        try:
+            save_student_skill(student_id, skill_name, "teach")
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Could not save teaching skill")
+            return "Could not save skill. Check the terminal.", 500
 
         return redirect(url_for("my_skills"))
 
-    return render_template(
-        "my_skills.html",
-        skills=skills
-    )
+    skills = get_student_skills(student_id, "teach")
+
+    return render_template("my_skills.html", skills=skills)
 
 
 @app.route("/remove-skill/<skill>")
 def remove_skill(skill):
+    student_id = session.get("user_id")
 
-    skills = session.get("skills", [])
+    if not student_id:
+        return redirect(url_for("login"))
 
-    if skill in skills:
-        skills.remove(skill)
+    record = (
+        StudentSkill.query
+        .join(Skill)
+        .filter(
+            StudentSkill.student_id == student_id,
+            StudentSkill.skill_type == "teach",
+            Skill.skill_name == skill
+        )
+        .first()
+    )
 
-    session["skills"] = skills
+    if record:
+        try:
+            db.session.delete(record)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Could not remove teaching skill")
+            return "Could not remove skill. Check the terminal.", 500
 
     return redirect(url_for("my_skills"))
 
 
 @app.route("/learn-skills")
 def learn_skills():
+    student_id = session.get("user_id")
 
-    skills = session.get("learn_skills", [])
+    if not student_id:
+        return redirect(url_for("login"))
 
     dataset_path = os.path.join(
-        app.root_path,
-        "dataset",
-        "skills_dataset.csv"
+        app.root_path, "dataset", "skills_dataset.csv"
     )
 
     available_skills = []
 
     with open(dataset_path, "r", encoding="utf-8-sig") as file:
-
         reader = csv.DictReader(file)
 
         for row in reader:
-
             skill_name = row.get("skill", "").strip()
             category_name = row.get("category", "").strip()
 
@@ -260,19 +341,16 @@ def learn_skills():
                     "category": category_name
                 })
 
-
     search = request.args.get("search", "").strip().lower()
 
-
     if search:
-
         available_skills = [
-            item
-            for item in available_skills
+            item for item in available_skills
             if search in item["skill"].lower()
             or search in item["category"].lower()
         ]
 
+    skills = get_student_skills(student_id, "learn")
 
     return render_template(
         "learn_skills.html",
@@ -280,19 +358,58 @@ def learn_skills():
         available_skills=available_skills,
         search=request.args.get("search", "").strip()
     )
+
+
 @app.route("/add-learn-skill", methods=["POST"])
 def add_learn_skill():
+    student_id = session.get("user_id")
 
-    skill = request.form.get("skill")
+    if not student_id:
+        return redirect(url_for("login"))
 
-    skills = session.get("learn_skills", [])
+    skill_name = request.form.get("skill", "").strip()
 
-    if skill and skill not in skills:
-        skills.append(skill)
-
-    session["learn_skills"] = skills
+    try:
+        save_student_skill(student_id, skill_name, "learn")
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Could not save learning skill")
+        return "Could not save learning skill. Check the terminal.", 500
 
     return redirect(url_for("learn_skills"))
+
+
+@app.route("/remove-learn-skill/<skill>")
+def remove_learn_skill(skill):
+    student_id = session.get("user_id")
+
+    if not student_id:
+        return redirect(url_for("login"))
+
+    record = (
+        StudentSkill.query
+        .join(Skill)
+        .filter(
+            StudentSkill.student_id == student_id,
+            StudentSkill.skill_type == "learn",
+            Skill.skill_name == skill
+        )
+        .first()
+    )
+
+    if record:
+        try:
+            db.session.delete(record)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Could not remove learning skill")
+            return "Could not remove learning skill. Check the terminal.", 500
+
+    return redirect(url_for("learn_skills"))
+
+
+
 @app.route("/find-learning-partner")
 def find_learning_partner():
 
@@ -346,17 +463,6 @@ def find_learning_partner():
     )
 
 
-@app.route("/remove-learn-skill/<skill>")
-def remove_learn_skill(skill):
-
-    skills = session.get("learn_skills", [])
-
-    if skill in skills:
-        skills.remove(skill)
-
-    session["learn_skills"] = skills
-
-    return redirect(url_for("learn_skills"))
 
 @app.route("/match-result")
 def match_result():
@@ -388,9 +494,6 @@ init_db(app)
 # Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(skills_bp)
-
-
-
 
 
 @app.route("/test-db")

@@ -36,6 +36,11 @@
                 Welcome back! Login to continue.
             </p>
 
+                {% if error %}
+        <p style="color: red; font-weight: bold;">
+            {{ error }}
+        </p>
+    {% endif %}
 
             <form action="{{ url_for('login') }}" method="post">
 
