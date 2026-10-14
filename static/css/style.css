@@ -2562,3 +2562,28 @@ padding: 0 14px;
 }
 ```
 
+.profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.change-password-btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #3157c8;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.change-password-btn:hover {
+    background: #2444a5;
+    transform: translateY(-2px);
+}
+
+
