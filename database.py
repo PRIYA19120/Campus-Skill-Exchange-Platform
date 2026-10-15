@@ -1,26 +1,16 @@
-
-import os
 from urllib.parse import quote_plus
 
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
-
-load_dotenv()
 
 db = SQLAlchemy()
 
 
 def init_db(app):
-    host = os.getenv("DB_HOST")
-    port = os.getenv("DB_PORT", "12728")
-    name = os.getenv("DB_NAME", "defaultdb")
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASSWORD")
-
-    if not all([host, user, password, name]):
-        raise RuntimeError(
-            "Database settings are missing. Check your .env file."
-        )
+    host = "127.0.0.1"
+    port = "3306"
+    name = "campus_skill_exchange"
+    user = "campus_user"
+    password = "Sstps"
 
     password = quote_plus(password)
 
@@ -28,11 +18,5 @@ def init_db(app):
         f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}"
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "connect_args": {
-            "ssl": {"ca": os.path.join(os.path.dirname(__file__), "ca.pem")}
-        }
-    }
 
     db.init_app(app)
