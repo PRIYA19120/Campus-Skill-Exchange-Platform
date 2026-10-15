@@ -211,9 +211,9 @@ def edit_profile():
         profile_picture=session.get("profile_picture")
     )
 
+
 @app.route("/change-password", methods=["GET", "POST"])
 def change_password():
-
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
@@ -230,30 +230,31 @@ def change_password():
         ).first()
 
         if not student:
+            session.clear()
             return redirect(url_for("login"))
 
         if not check_password_hash(student.password, current_password):
-            error = "Current password is incorrect."
+            error = "Your current password is incorrect."
 
         elif len(new_password) < 8:
-            error = "New password must be at least 8 characters."
+            error = "New password must contain at least 8 characters."
 
         elif new_password != confirm_password:
-            error = "New passwords do not match."
+            error = "New password and confirm password do not match."
 
         elif check_password_hash(student.password, new_password):
-            error = "New password must be different from the current password."
+            error = "Please choose a password different from your current password."
 
         else:
             try:
                 student.password = generate_password_hash(new_password)
                 db.session.commit()
-                success = "Password changed successfully."
+                success = "Password changed successfully!"
 
             except Exception:
                 db.session.rollback()
                 app.logger.exception("Password change failed")
-                error = "Could not change password. Please try again."
+                error = "Unable to change password. Please try again."
 
     return render_template(
         "change_password.html",
