@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Find Learning Partner | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .request-messages {
+            margin-bottom: 20px;
+        }
+
+        .request-message {
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .request-message.success {
+            background: #e7f8ed;
+            color: #176534;
+        }
+
+        .request-message.error {
+            background: #fdeaea;
+            color: #a32121;
+        }
+
+        .request-message.info {
+            background: #eaf2ff;
+            color: #214e91;
+        }
+
+        .partner-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .partner-details p {
+            margin: 8px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .matched-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .matched-skill {
+            display: inline-block;
+        }
+
+        .skill-request-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .skill-request-item .matched-skill {
+            margin: 0;
+        }
+
+        .skill-request-form {
+            margin: 0;
+        }
+
+        .send-request-btn {
+            cursor: pointer;
+            border: none;
+        }
+
+        .availability-section {
+            margin-top: 18px;
+        }
+
+        .availability-section h4 {
+            margin-bottom: 8px;
+        }
+
+        .availability-list {
+            padding-left: 20px;
+            margin: 8px 0 0;
+        }
+
+        .availability-list li {
+            margin-bottom: 6px;
+            overflow-wrap: anywhere;
+        }
+
+        .no-availability {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .partner-card > .request-note {
+            margin-top: 12px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .empty-partners {
+            padding: 32px 16px;
+            text-align: center;
+        }
+
+        .empty-partner-icon {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .find-skills-btn {
+            display: inline-block;
+            margin-top: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <div class="logo-box">S</div>
+
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('dashboard') }}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('profile') }}">
+                <span>◉</span>
+                Profile
+            </a>
+
+            <a href="{{ url_for('my_skills') }}">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="{{ url_for('learn_skills') }}">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="{{ url_for('find_learning_partner') }}"
+               class="active">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="{{ url_for('match_result') }}">
+                <span>🎯</span>
+                Match Result
+            </a>
+
+            <a href="{{ url_for('skill_gap_analysis') }}">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}">
+                ← Logout
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-content">
+
+        <div class="profile-header">
+            <div>
+                <p class="small-title">CONNECT WITH STUDENTS</p>
+
+                <h1>Find Learning Partner</h1>
+
+                <p>
+                    Find students who can teach the skills you want to learn.
+                </p>
+            </div>
+        </div>
+
+
+        <!-- SUCCESS AND ERROR MESSAGES -->
+        <div class="request-messages" aria-live="polite">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="request-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+
+        <!-- LEARNING PARTNERS -->
+        <div class="partner-main-card">
+
+            <div class="skills-card-header">
+                <div>
+                    <h2>Recommended Learning Partners</h2>
+                    <p>
+                        Students matched with your learning goals.
+                    </p>
+                </div>
+            </div>
+
+
+            {% if not my_learning_skills %}
+
+                <div class="empty-partners">
+                    <div class="empty-partner-icon">📚</div>
+
+                    <h3>Add your learning goals first</h3>
+
+                    <p>
+                        Select the skills you want to learn so we can
+                        find students who can teach them.
+                    </p>
+
+                    <a href="{{ url_for('learn_skills') }}"
+                       class="find-skills-btn">
+                        Add Learning Skills
+                    </a>
+                </div>
+
+            {% elif students %}
+
+                <div class="partner-grid">
+
+                    {% for student in students %}
+
+                        <div class="partner-card">
+
+                            <!-- STUDENT DETAILS -->
+                            <div class="partner-top">
+
+                                <div class="partner-avatar">
+                                    {{ student.name[0] | upper }}
+                                </div>
+
+                                <div class="partner-info">
+                                    <h3>{{ student.name }}</h3>
+
+                                    <span>
+                                        @{{ student.username }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="partner-details">
+                                <p>
+                                    <strong>Department:</strong>
+                                    {{ student.department }}
+                                </p>
+
+                                <p>
+                                    <strong>Semester:</strong>
+                                    {{ student.semester }}
+                                </p>
+                            </div>
+
+
+                            <!-- MATCHED SKILLS -->
+                            <div class="matched-section">
+
+                                <span class="matched-title">
+                                    Can teach you
+                                </span>
+
+                                {% for skill in student.matched_skills %}
+
+                                    <div class="skill-request-item">
+
+                                        <span class="matched-skill">
+                                            {{ skill.skill_name }}
+                                        </span>
+
+                                        <form
+                                            class="skill-request-form"
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'send_learning_request',
+                                                partner_id=student.student_id,
+                                                skill_id=skill.skill_id
+                                            ) }}"
+                                            onsubmit="return confirm(
+                                                'Send a learning request for {{ skill.skill_name }} to {{ student.name }}?'
+                                            );">
+
+                                            <button
+                                                type="submit"
+                                                class="send-request-btn">
+                                                Send Request
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- COMMON AVAILABILITY -->
+                            <div class="availability-section">
+
+                                <h4>Common Availability</h4>
+
+                                {% if student.common_availability %}
+
+                                    <ul class="availability-list">
+                                        {% for slot in student.common_availability %}
+                                            <li>{{ slot.label }}</li>
+                                        {% endfor %}
+                                    </ul>
+
+                                {% else %}
+
+                                    <p class="no-availability">
+                                        No overlapping availability listed.
+                                        You can still send a request.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                            <p class="request-note">
+                                Requests are saved as pending until
+                                the platform's request-response workflow
+                                is implemented.
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-partners">
+
+                    <div class="empty-partner-icon">🤝</div>
+
+                    <h3>No matching partners found</h3>
+
+                    <p>
+                        No other student currently teaches the skills
+                        in your learning goals. Try adding more goals,
+                        or check back when more students add their skills.
+                    </p>
+
+                    <a href="{{ url_for('learn_skills') }}"
+                       class="find-skills-btn">
+                        Manage Learning Skills
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
