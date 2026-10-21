@@ -1,0 +1,376 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Learn Skills | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <div class="logo-box">S</div>
+
+            <div>
+                <h2>Skill Exchange</h2>
+                <span>Campus Platform</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('dashboard') }}">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('profile') }}">
+                <span>◉</span>
+                Profile
+            </a>
+
+            <a href="{{ url_for('my_skills') }}">
+                <span>◆</span>
+                My Skills
+            </a>
+
+            <a href="{{ url_for('learn_skills') }}" class="active">
+                <span>📚</span>
+                Learn Skills
+            </a>
+
+            <a href="{{ url_for('find_learning_partner') }}">
+                <span>🤝</span>
+                Find Learning Partner
+            </a>
+
+            <a href="{{ url_for('match_result') }}">
+                <span>🎯</span>
+                Match Result
+            </a>
+
+            <a href="#">
+                <span>📊</span>
+                Skill Gap Analysis
+            </a>
+
+            <a href="#">
+                <span>⭐</span>
+                Rating &amp; Feedback
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}">
+                ← Logout
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-content">
+
+        <div class="profile-header">
+            <div>
+                <p class="small-title">LEARNING GOALS</p>
+
+                <h1>Learn Skills</h1>
+
+                <p>
+                    Search for skills you want to learn and add them
+                    to your learning goals.
+                </p>
+            </div>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="skills-main-card">
+
+            <div class="skills-card-header">
+                <div>
+                    <h2>Find Skills to Learn</h2>
+
+                    <p>
+                        Search existing skills or add a new skill
+                        of your choice.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SEARCH FORM -->
+            <form action="{{ url_for('learn_skills') }}"
+                  method="GET"
+                  class="skill-search-form">
+
+                <div class="skill-search-box">
+                    <span>⌕</span>
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="Search or type a new skill..."
+                        maxlength="100">
+                </div>
+
+                <button type="submit" class="search-submit-btn">
+                    Search
+                </button>
+
+            </form>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- ADD CUSTOM SKILL -->
+            {% if can_add_custom_skill %}
+                <div class="custom-skill-box">
+
+                    <p>
+                        <strong>{{ search }}</strong>
+                        is not in the existing skill list.
+                    </p>
+
+                    <p>
+                        You can add it as a new learning skill.
+                    </p>
+
+                    <form action="{{ url_for('add_learn_skill') }}"
+                          method="POST">
+
+                        <input type="hidden"
+                               name="skill"
+                               value="{{ search }}">
+
+                        <button type="submit" class="add-skill-btn">
+                            + Add "{{ search }}" as a New Skill
+                        </button>
+
+                    </form>
+
+                </div>
+            {% endif %}
+
+            <!-- POPULAR SKILLS -->
+            <div class="quick-skills">
+
+                <h3>Popular Skills</h3>
+
+                <div class="quick-skills-list">
+
+                    <a href="{{ url_for('learn_skills', search='Python') }}">
+                        Python
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='Java') }}">
+                        Java
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='C') }}">
+                        C
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='C++') }}">
+                        C++
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='JavaScript') }}">
+                        JavaScript
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='HTML') }}">
+                        HTML
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='CSS') }}">
+                        CSS
+                    </a>
+
+                    <a href="{{ url_for('learn_skills', search='SQL') }}">
+                        SQL
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- AVAILABLE SKILLS -->
+            <div class="available-skills">
+
+                <h3>Available Skills</h3>
+
+                <div class="skills-list">
+
+                    {% for skill in available_skills %}
+
+                        <div class="available-skill-card">
+
+                            <div class="skill-icon">
+                                ◆
+                            </div>
+
+                            <div class="skill-info">
+                                <h3>{{ skill.skill }}</h3>
+                                <span>{{ skill.category }}</span>
+                            </div>
+
+                            {% if skill.skill in skills %}
+
+                                <span class="skill-added">
+                                    ✓ Added
+                                </span>
+
+                            {% else %}
+
+                                <form
+                                    action="{{ url_for('add_learn_skill') }}"
+                                    method="POST">
+
+                                    <input
+                                        type="hidden"
+                                        name="skill"
+                                        value="{{ skill.skill }}">
+
+                                    <button
+                                        type="submit"
+                                        class="add-skill-btn">
+                                        + Add
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="empty-skills">
+
+                            <div class="empty-icon">🔍</div>
+
+                            <h3>No skills found</h3>
+
+                            <p>
+                                Try another search or add your own skill.
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            <!-- MY LEARNING SKILLS -->
+            <div class="my-learning-skills">
+
+                <h3>My Learning Skills</h3>
+
+                <div class="skills-grid">
+
+                    {% if skills %}
+
+                        {% for skill in skills %}
+
+                            <div class="skill-item">
+
+                                <div class="skill-icon">
+                                    📚
+                                </div>
+
+                                <div class="skill-info">
+                                    <h3>{{ skill }}</h3>
+                                    <span>Want to Learn</span>
+                                </div>
+
+                                <a
+                                    href="{{ url_for('remove_learn_skill', skill=skill) }}"
+                                    class="remove-skill">
+                                    Remove
+                                </a>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-skills">
+
+                            <div class="empty-icon">📚</div>
+
+                            <h3>No learning skills added yet</h3>
+
+                            <p>
+                                Search for a skill and click Add to
+                                start your learning journey.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FIND LEARNING PARTNER -->
+        <div class="learning-options">
+
+            <a
+                href="{{ url_for('find_learning_partner') }}"
+                class="learning-option-card">
+
+                <div class="learning-option-icon">
+                    🤝
+                </div>
+
+                <div class="learning-option-content">
+                    <h3>Find Learning Partner</h3>
+
+                    <p>
+                        Find students who can teach the skills
+                        you want to learn.
+                    </p>
+                </div>
+
+                <div class="learning-option-arrow">
+                    →
+                </div>
+
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
+```

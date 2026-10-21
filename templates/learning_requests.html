@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming Learning Requests | Campus Skill Exchange</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+        }
+
+        header {
+            background: #253b80;
+            color: white;
+            padding: 22px 7%;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 26px;
+        }
+
+        header p {
+            margin: 0;
+            color: #e1e8ff;
+        }
+
+        nav {
+            background: white;
+            padding: 14px 7%;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e1e6ef;
+        }
+
+        nav a {
+            color: #253b80;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .page-heading {
+            margin-bottom: 24px;
+        }
+
+        .page-heading h2 {
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #68758b;
+            line-height: 1.5;
+        }
+
+        .flash {
+            padding: 13px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .flash.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .flash.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .flash.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .request-card {
+            background: white;
+            border: 1px solid #e1e6ef;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 3px 12px rgba(30, 50, 90, 0.05);
+        }
+
+        .request-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .request-top h3 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .request-top p {
+            margin: 5px 0;
+            color: #64748b;
+        }
+
+        .skill {
+            margin-top: 18px;
+            padding: 13px 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+        }
+
+        .skill strong {
+            color: #253b80;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.Accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.Rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .accept-btn {
+            background: #15803d;
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background: #166534;
+        }
+
+        .reject-btn {
+            background: #dc2626;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #b91c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            background: white;
+            padding: 45px 20px;
+            border-radius: 12px;
+            border: 1px solid #e1e6ef;
+        }
+
+        .empty-state h3 {
+            margin-top: 0;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            color: #253b80;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px 15px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 22px;
+            }
+
+            main {
+                margin-top: 24px;
+                padding: 0 14px;
+            }
+
+            .request-card {
+                padding: 17px;
+            }
+
+            .actions form,
+            .actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Campus Skill Exchange</h1>
+        <p>Manage your incoming learning requests</p>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('find_learning_partner') }}">Find Partners</a>
+        <a href="{{ url_for('match_result') }}">Match Results</a>
+        <a href="{{ url_for('learning_requests') }}">Incoming Requests</a>
+        <a href="{{ url_for('profile') }}">My Profile</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+
+    <main>
+        <div class="page-heading">
+            <h2>Incoming Learning Requests</h2>
+            <p>
+                Students who want to learn a skill from you will appear here.
+                Accept a request if you want to connect, or reject it if you
+                cannot help right now.
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if incoming %}
+            {% for req in incoming %}
+                <div class="request-card">
+
+                    <div class="request-top">
+                        <div>
+                            <h3>{{ req.sender_name }}</h3>
+
+                            <p>
+                                Department:
+                                {{ req.sender_department or "Not specified" }}
+                            </p>
+
+                            {% if req.created_at %}
+                                <p>
+                                    Sent on:
+                                    {{ req.created_at.strftime("%d %b %Y, %I:%M %p") }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <span class="status {{ req.status }}">
+                            {{ req.status }}
+                        </span>
+                    </div>
+
+                    <div class="skill">
+                        <strong>Skill requested:</strong>
+                        {{ req.skill_name }}
+                    </div>
+
+                    {% if req.status == "Pending" %}
+                        <div class="actions">
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'respond_learning_request',
+                                    request_id=req.request_id,
+                                    action='accept'
+                                ) }}"
+                                onsubmit="return confirm('Accept this learning request?');"
+                            >
+                                <button class="accept-btn" type="submit">
+                                    Accept Request
+                                </button>
+                            </form>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'respond_learning_request',
+                                    request_id=req.request_id,
+                                    action='reject'
+                                ) }}"
+                                onsubmit="return confirm('Reject this learning request?');"
+                            >
+                                <button class="reject-btn" type="submit">
+                                    Reject Request
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <p>
+                            This request has already been handled.
+                        </p>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="empty-state">
+                <h3>No incoming requests yet</h3>
+                <p>
+                    When another student sends you a learning request,
+                    it will appear here.
+                </p>
+
+                <a
+                    class="back-link"
+                    href="{{ url_for('find_learning_partner') }}"
+                >
+                    Find Learning Partners
+                </a>
+            </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        Campus Skill Exchange &copy; {{ now.year if now is defined else "" }}
+    </footer>
+
+</body>
+</html>

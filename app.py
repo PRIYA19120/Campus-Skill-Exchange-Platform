@@ -18,6 +18,7 @@ import models
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import and_, or_
 
 from models import (
     Student,
@@ -443,45 +444,63 @@ def learn_skills():
     if not student_id:
         return redirect(url_for("login"))
 
+    search = request.args.get("search", "").strip()
     dataset_path = os.path.join(
-        app.root_path,
-        "dataset",
-        "skills_dataset.csv"
+        app.root_path, "dataset", "skills_dataset.csv"
     )
 
-    available_skills = []
+    skill_catalog = {}
 
     try:
         with open(dataset_path, "r", encoding="utf-8-sig") as file:
             reader = csv.DictReader(file)
 
             for row in reader:
-                skill_name = row.get("skill", "").strip()
-                category_name = row.get("category", "").strip()
+                name = row.get("skill", "").strip()
+                category = row.get("category", "").strip()
 
-                if skill_name:
-                    available_skills.append({
-                        "skill": skill_name,
-                        "category": category_name
-                    })
+                if name:
+                    skill_catalog[name.casefold()] = {
+                        "skill": name,
+                        "category": category or "General"
+                    }
 
     except FileNotFoundError:
         app.logger.warning("Skills dataset not found: %s", dataset_path)
 
-    search = request.args.get("search", "").strip().lower()
+    database_skills = Skill.query.order_by(Skill.skill_name.asc()).all()
+
+    for skill in database_skills:
+        key = skill.skill_name.strip().casefold()
+
+        if key:
+            skill_catalog[key] = {
+                "skill": skill.skill_name,
+                "category": skill.category or "Community Added"
+            }
+
+    exact_skill_exists = (
+        search.casefold() in skill_catalog if search else False
+    )
+
+    available_skills = list(skill_catalog.values())
 
     if search:
+        query = search.casefold()
         available_skills = [
             item for item in available_skills
-            if search in item["skill"].lower()
-            or search in item["category"].lower()
+            if query in item["skill"].casefold()
+            or query in item["category"].casefold()
         ]
+
+    available_skills.sort(key=lambda item: item["skill"].casefold())
 
     return render_template(
         "learn_skills.html",
         skills=get_student_skills(student_id, "learn"),
         available_skills=available_skills,
-        search=request.args.get("search", "").strip()
+        search=search,
+        can_add_custom_skill=bool(search) and not exact_skill_exists
     )
 
 
@@ -493,14 +512,55 @@ def add_learn_skill():
         return redirect(url_for("login"))
 
     skill_name = request.form.get("skill", "").strip()
+    normalized_name = " ".join(skill_name.split())
+
+    if (
+        not normalized_name
+        or len(normalized_name) > 100
+        or not any(char.isalnum() for char in normalized_name)
+    ):
+        flash("Please enter a valid skill name (1-100 characters).", "error")
+        return redirect(url_for("learn_skills"))
 
     try:
-        save_student_skill(student_id, skill_name, "learn")
-        flash("Learning goal saved successfully.", "success")
+        skill = Skill.query.filter(
+            db.func.lower(Skill.skill_name) == normalized_name.casefold()
+        ).first()
+
+        if not skill:
+            skill = Skill(
+                skill_name=normalized_name,
+                category="Community Added"
+            )
+            db.session.add(skill)
+            db.session.flush()
+
+        existing = StudentSkill.query.filter_by(
+            student_id=student_id,
+            skill_id=skill.skill_id,
+            skill_type="learn"
+        ).first()
+
+        if existing:
+            flash("This learning skill is already added.", "info")
+        else:
+            db.session.add(
+                StudentSkill(
+                    student_id=student_id,
+                    skill_id=skill.skill_id,
+                    skill_type="learn"
+                )
+            )
+            db.session.commit()
+            flash(
+                f"{skill.skill_name} added to your learning goals!",
+                "success"
+            )
+
     except Exception:
         db.session.rollback()
         app.logger.exception("Could not save learning skill")
-        flash("Could not save learning goal. Please try again.", "error")
+        flash("Could not save the skill. Please try again.", "error")
 
     return redirect(url_for("learn_skills"))
 
@@ -554,20 +614,13 @@ def get_common_availability(student_id, partner_id):
             ):
                 continue
 
-            overlap_start = max(
-                my_slot.start_time,
-                partner_slot.start_time
-            )
-            overlap_end = min(
-                my_slot.end_time,
-                partner_slot.end_time
-            )
+            overlap_start = max(my_slot.start_time, partner_slot.start_time)
+            overlap_end = min(my_slot.end_time, partner_slot.end_time)
 
             if overlap_start < overlap_end:
                 day = my_slot.day_of_week.title()
                 start_text = overlap_start.strftime("%I:%M %p")
                 end_text = overlap_end.strftime("%I:%M %p")
-
                 key = (day, start_text, end_text)
 
                 if key not in seen:
@@ -576,9 +629,7 @@ def get_common_availability(student_id, partner_id):
                         "day": day,
                         "start": start_text,
                         "end": end_text,
-                        "label": (
-                            f"{day}: {start_text} - {end_text}"
-                        )
+                        "label": f"{day}: {start_text} - {end_text}"
                     })
 
     return common_slots
@@ -609,15 +660,11 @@ def find_learning_partner():
     matching_students = []
 
     if my_learning_skill_ids:
-        teaching_records = (
-            StudentSkill.query
-            .filter(
-                StudentSkill.skill_type == "teach",
-                StudentSkill.skill_id.in_(my_learning_skill_ids),
-                StudentSkill.student_id != student_id
-            )
-            .all()
-        )
+        teaching_records = StudentSkill.query.filter(
+            StudentSkill.skill_type == "teach",
+            StudentSkill.skill_id.in_(my_learning_skill_ids),
+            StudentSkill.student_id != student_id
+        ).all()
 
         partner_skill_map = {}
 
@@ -633,25 +680,23 @@ def find_learning_partner():
                     "skills": {}
                 }
 
-            partner_skill_map[partner_id]["skills"][
-                record.skill_id
-            ] = record.skill
+            partner_skill_map[partner_id]["skills"][record.skill_id] = (
+                record.skill
+            )
 
         for partner_id, data in partner_skill_map.items():
             partner = data["student"]
-            matched_skills = list(data["skills"].values())
 
-            matched_skill_items = []
-
-            for skill in matched_skills:
-                matched_skill_items.append({
+            matched_skill_items = [
+                {
                     "skill_id": skill.skill_id,
                     "skill_name": skill.skill_name
-                })
+                }
+                for skill in data["skills"].values()
+            ]
 
             common_slots = get_common_availability(
-                student_id,
-                partner_id
+                student_id, partner_id
             )
 
             matching_students.append({
@@ -699,14 +744,12 @@ def send_learning_request(partner_id, skill_id):
         flash("Student or skill was not found.", "error")
         return redirect(url_for("find_learning_partner"))
 
-    # The requester must have this skill in their learning goals.
     wants_to_learn = StudentSkill.query.filter_by(
         student_id=student_id,
         skill_id=skill_id,
         skill_type="learn"
     ).first()
 
-    # The selected partner must offer to teach this skill.
     can_teach = StudentSkill.query.filter_by(
         student_id=partner_id,
         skill_id=skill_id,
@@ -720,18 +763,40 @@ def send_learning_request(partner_id, skill_id):
         )
         return redirect(url_for("find_learning_partner"))
 
-    existing_request = LearningRequest.query.filter_by(
-        student_id=student_id,
-        partner_id=partner_id,
-        skill_id=skill_id,
-        status="Pending"
+    # Block a duplicate request in either direction for this skill.
+    existing_request = LearningRequest.query.filter(
+        LearningRequest.skill_id == skill_id,
+        LearningRequest.status.in_(["Pending", "Accepted"]),
+        or_(
+            and_(
+                LearningRequest.student_id == student_id,
+                LearningRequest.partner_id == partner_id
+            ),
+            and_(
+                LearningRequest.student_id == partner_id,
+                LearningRequest.partner_id == student_id
+            )
+        )
     ).first()
 
     if existing_request:
-        flash(
-            f"Your request for {skill.skill_name} is already pending.",
-            "info"
-        )
+        if existing_request.status == "Accepted":
+            flash(
+                "A request for this skill has already been accepted.",
+                "info"
+            )
+        elif existing_request.student_id == student_id:
+            flash(
+                f"Your request for {skill.skill_name} is already pending.",
+                "info"
+            )
+        else:
+            flash(
+                "This student has already requested this skill from you. "
+                "Please respond to their request instead.",
+                "info"
+            )
+
         return redirect(url_for("find_learning_partner"))
 
     try:
@@ -762,12 +827,300 @@ def send_learning_request(partner_id, skill_id):
     return redirect(url_for("find_learning_partner"))
 
 
-@app.route("/match-result")
-def match_result():
-    if not session.get("user_id"):
+# Show requests received by the logged-in student.
+@app.route("/learning-requests")
+def learning_requests():
+    student_id = session.get("user_id")
+
+    if not student_id:
         return redirect(url_for("login"))
 
-    return render_template("match_result.html")
+    received_requests = LearningRequest.query.filter_by(
+        partner_id=student_id
+    ).order_by(
+        LearningRequest.created_at.desc()
+    ).all()
+
+    incoming = []
+
+    for req in received_requests:
+        sender = db.session.get(Student, req.student_id)
+        skill = db.session.get(Skill, req.skill_id)
+
+        incoming.append({
+            "request_id": req.request_id,
+            "sender_name": sender.name if sender else "Unknown student",
+            "sender_department": (
+                sender.department if sender else "Not specified"
+            ),
+            "skill_name": skill.skill_name if skill else "Unknown skill",
+            "status": req.status,
+            "created_at": req.created_at
+        })
+
+    return render_template(
+        "learning_requests.html",
+        incoming=incoming
+    )
+
+
+# Only the receiving student can accept or reject a request.
+@app.route(
+    "/learning-request/<int:request_id>/<action>",
+    methods=["POST"]
+)
+def respond_learning_request(request_id, action):
+    student_id = session.get("user_id")
+
+    if not student_id:
+        return redirect(url_for("login"))
+
+    if action not in ("accept", "reject"):
+        flash("Invalid request action.", "error")
+        return redirect(url_for("learning_requests"))
+
+    req = db.session.get(LearningRequest, request_id)
+
+    if not req:
+        flash("Learning request not found.", "error")
+        return redirect(url_for("learning_requests"))
+
+    if req.partner_id != student_id:
+        flash("You cannot respond to this request.", "error")
+        return redirect(url_for("learning_requests"))
+
+    if req.status != "Pending":
+        flash("This request has already been handled.", "info")
+        return redirect(url_for("learning_requests"))
+
+    try:
+        if action == "accept":
+            req.status = "Accepted"
+            message = "Learning request accepted successfully!"
+        else:
+            req.status = "Rejected"
+            message = "Learning request rejected."
+
+        db.session.commit()
+        flash(message, "success")
+
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Could not update learning request")
+        flash("Could not update the request. Please try again.", "error")
+
+    return redirect(url_for("learning_requests"))
+
+
+@app.route("/match-result")
+def match_result():
+    student_id = session.get("user_id")
+
+    if not student_id:
+        return redirect(url_for("login"))
+
+    current_student = db.session.get(Student, student_id)
+
+    if not current_student:
+        session.clear()
+        return redirect(url_for("login"))
+
+    my_learning_records = StudentSkill.query.filter_by(
+        student_id=student_id,
+        skill_type="learn"
+    ).all()
+
+    my_learning_skill_ids = {
+        record.skill_id for record in my_learning_records
+    }
+
+    my_learning_skills = [
+        record.skill.skill_name
+        for record in my_learning_records
+        if record.skill
+    ]
+
+    my_teaching_records = StudentSkill.query.filter_by(
+        student_id=student_id,
+        skill_type="teach"
+    ).all()
+
+    my_teaching_skill_ids = {
+        record.skill_id for record in my_teaching_records
+    }
+
+    matching_students = {}
+
+    if my_learning_skill_ids:
+        teaching_records = StudentSkill.query.filter(
+            StudentSkill.skill_type == "teach",
+            StudentSkill.skill_id.in_(my_learning_skill_ids),
+            StudentSkill.student_id != student_id
+        ).all()
+
+        for record in teaching_records:
+            partner = record.student
+            skill = record.skill
+
+            if not partner or not skill:
+                continue
+
+            partner_id = partner.student_id
+
+            if partner_id not in matching_students:
+                matching_students[partner_id] = {
+                    "student_id": partner_id,
+                    "name": partner.name,
+                    "department": partner.department or "Not specified",
+                    "semester": partner.semester or "Not specified",
+                    "matched_skills": [],
+                    "teaching_skills": [],
+                    "learning_skills": [],
+                    "common_availability": [],
+                    "match_score": 0,
+                    "score_breakdown": {}
+                }
+
+            item = matching_students[partner_id]
+
+            if not any(
+                s["skill_id"] == skill.skill_id
+                for s in item["matched_skills"]
+            ):
+                item["matched_skills"].append({
+                    "skill_id": skill.skill_id,
+                    "skill_name": skill.skill_name
+                })
+
+    for partner_id, item in matching_students.items():
+        partner = db.session.get(Student, partner_id)
+
+        partner_records = StudentSkill.query.filter_by(
+            student_id=partner_id
+        ).all()
+
+        partner_learning_ids = set()
+
+        for record in partner_records:
+            if not record.skill:
+                continue
+
+            skill_item = {
+                "skill_id": record.skill.skill_id,
+                "skill_name": record.skill.skill_name
+            }
+
+            if record.skill_type == "teach":
+                if not any(
+                    s["skill_id"] == skill_item["skill_id"]
+                    for s in item["teaching_skills"]
+                ):
+                    item["teaching_skills"].append(skill_item)
+
+            elif record.skill_type == "learn":
+                partner_learning_ids.add(record.skill_id)
+
+                if not any(
+                    s["skill_id"] == skill_item["skill_id"]
+                    for s in item["learning_skills"]
+                ):
+                    item["learning_skills"].append(skill_item)
+
+        # Skill match: 40 points.
+        total_goals = len(my_learning_skill_ids)
+        matched_count = len(item["matched_skills"])
+
+        skill_score = (
+            40 * matched_count / total_goals
+            if total_goals else 0
+        )
+
+        # Common availability: 30 points.
+        common_slots = get_common_availability(student_id, partner_id)
+        item["common_availability"] = common_slots
+
+        slot_keys = {
+            (slot["day"], slot["start"], slot["end"])
+            for slot in common_slots
+        }
+
+        availability_score = min(len(slot_keys), 3) * 10
+
+        # Department and semester: 10 points.
+        department_score = 0
+        semester_score = 0
+
+        my_department = (current_student.department or "").strip()
+        partner_department = (partner.department or "").strip()
+
+        if (
+            my_department
+            and partner_department
+            and my_department.casefold() == partner_department.casefold()
+        ):
+            department_score = 5
+
+        my_semester = (current_student.semester or "").strip()
+        partner_semester = (partner.semester or "").strip()
+
+        if (
+            my_semester
+            and partner_semester
+            and my_semester.casefold() == partner_semester.casefold()
+        ):
+            semester_score = 5
+
+        academic_score = department_score + semester_score
+
+        # Mutual skill exchange: 10 points.
+        mutual_matches = my_teaching_skill_ids & partner_learning_ids
+        mutual_score = 10 if mutual_matches else 0
+
+        # Profile completeness: 10 points.
+        profile_score = 0
+
+        if (partner.bio or "").strip():
+            profile_score += 4
+
+        if partner.department:
+            profile_score += 3
+
+        if partner.semester:
+            profile_score += 3
+
+        total_score = round(
+            skill_score
+            + availability_score
+            + academic_score
+            + mutual_score
+            + profile_score
+        )
+
+        item["match_score"] = min(total_score, 100)
+
+        item["score_breakdown"] = {
+            "skill_match": round(skill_score),
+            "availability": availability_score,
+            "academic": academic_score,
+            "mutual_exchange": mutual_score,
+            "profile": profile_score
+        }
+
+    students = list(matching_students.values())
+
+    students.sort(
+        key=lambda item: (
+            -item["match_score"],
+            -len(item["matched_skills"]),
+            item["name"].lower()
+        )
+    )
+
+    return render_template(
+        "match_result.html",
+        students=students,
+        my_learning_skills=my_learning_skills
+    )
 
 
 @app.route("/images/<filename>")
@@ -855,13 +1208,8 @@ def availability():
             error = "Please select a valid day."
         else:
             try:
-                start_time = datetime.strptime(
-                    start, "%H:%M"
-                ).time()
-
-                end_time = datetime.strptime(
-                    end, "%H:%M"
-                ).time()
+                start_time = datetime.strptime(start, "%H:%M").time()
+                end_time = datetime.strptime(end, "%H:%M").time()
 
                 if start_time >= end_time:
                     error = "End time must be later than start time."

@@ -1,0 +1,660 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Results | Campus Skill Exchange</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #20243a;
+        }
+
+        header {
+            background: #fff;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px #0000000d;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: bold;
+            color: #5146d8;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #555b70;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #5146d8;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .heading p {
+            color: #70758a;
+            line-height: 1.6;
+        }
+
+        .summary {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 18px #20243a08;
+        }
+
+        .summary h2 {
+            font-size: 18px;
+            margin-bottom: 7px;
+        }
+
+        .summary p {
+            color: #777c8f;
+            font-size: 14px;
+        }
+
+        .count {
+            background: #eeecff;
+            color: #5146d8;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-weight: bold;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 13px 15px;
+            margin-bottom: 25px;
+            border: 1px solid #dfe2ec;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: #5146d8;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 24px;
+            border-radius: 15px;
+            box-shadow: 0 4px 18px #20243a08;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 55px;
+            height: 55px;
+            background: #eeecff;
+            color: #5146d8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-size: 22px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .profile h3 {
+            margin-bottom: 6px;
+            font-size: 18px;
+        }
+
+        .profile p {
+            color: #777c8f;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .section {
+            margin: 17px 0;
+        }
+
+        .section h4 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 7px;
+            font-size: 12px;
+            background: #f0efff;
+            color: #5146d8;
+        }
+
+        .tag.green {
+            background: #e4f8ed;
+            color: #18834c;
+        }
+
+        .tag.gray {
+            background: #f0f1f5;
+            color: #64697a;
+        }
+
+        /* Match score */
+        .match-score {
+            margin: 18px 0;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e8eaf2;
+        }
+
+        .match-score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .match-score-header strong {
+            font-size: 15px;
+        }
+
+        .score-number {
+            font-size: 21px;
+            font-weight: bold;
+            color: #5146d8;
+        }
+
+        .match-score-track {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .match-score-fill {
+            height: 100%;
+            background: #16a34a;
+            border-radius: 20px;
+        }
+
+        .match-label {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 9px;
+            border-radius: 6px;
+            background: #e4f8ed;
+            color: #18834c;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .match-score details {
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .match-score summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .score-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .score-list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e8eaf2;
+        }
+
+        .availability-slot {
+            display: inline-block;
+            background: #e4f8ed;
+            color: #18834c;
+            padding: 7px 9px;
+            border-radius: 7px;
+            font-size: 12px;
+            margin: 0 5px 5px 0;
+        }
+
+        .request-form {
+            margin-top: 20px;
+        }
+
+        .request-form select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #dfe2ec;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .request-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #5146d8;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .request-btn:hover {
+            background: #4035bd;
+        }
+
+        .empty {
+            background: white;
+            padding: 45px 20px;
+            text-align: center;
+            border-radius: 15px;
+            color: #777c8f;
+            grid-column: 1 / -1;
+        }
+
+        .empty h3 {
+            color: #20243a;
+            margin-bottom: 10px;
+        }
+
+        .empty a {
+            display: inline-block;
+            margin-top: 18px;
+            background: #5146d8;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888da0;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .heading h1 {
+                font-size: 25px;
+            }
+
+            header {
+                padding: 16px 5%;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Campus Skill Exchange</div>
+
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('my_skills') }}">My Skills</a>
+        <a href="{{ url_for('learn_skills') }}">Learn Skills</a>
+        <a href="{{ url_for('match_result') }}">Match Results</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <div class="heading">
+        <h1>Your Learning Matches</h1>
+        <p>Discover students who can teach the skills you want to learn.</p>
+    </div>
+
+    <div class="summary">
+        <div>
+            <h2>Students Matching Your Goals</h2>
+            <p>Students are ranked by skill compatibility and other factors.</p>
+        </div>
+
+        <div class="count">
+            {{ students|length }} Profiles
+        </div>
+    </div>
+
+    {% if my_learning_skills %}
+    <div class="section">
+        <h4>Your Learning Goals</h4>
+        <div class="tags">
+            {% for skill in my_learning_skills %}
+                <span class="tag">{{ skill }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <input
+        type="text"
+        id="searchInput"
+        class="search-box"
+        placeholder="Search by student name, department, or skill..."
+        aria-label="Search matching students"
+    >
+
+    <div class="cards" id="studentCards">
+
+        {% for student in students %}
+
+        <article
+            class="card student-card"
+            data-search="{{ student.name|default('', true)|lower }} {{ student.department|default('', true)|lower }} {% for skill in student.matched_skills %}{{ skill.skill_name|default('', true)|lower }} {% endfor %} {% for skill in student.teaching_skills %}{{ skill.skill_name|default('', true)|lower }} {% endfor %}"
+        >
+
+            <div class="profile">
+                <div class="avatar">
+                    {{ student.name[0]|upper if student.name else '?' }}
+                </div>
+
+                <div>
+                    <h3>{{ student.name }}</h3>
+                    <p>
+                        {{ student.department or 'Department not specified' }}
+                        {% if student.semester %}
+                            · Semester {{ student.semester }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Match score -->
+            <div class="match-score">
+                <div class="match-score-header">
+                    <strong>Match Score</strong>
+                    <span class="score-number">
+                        {{ student.match_score|default(0) }}/100
+                    </span>
+                </div>
+
+                <div class="match-score-track">
+                    <div
+                        class="match-score-fill"
+                        style="width: {{ student.match_score|default(0) }}%;"
+                    ></div>
+                </div>
+
+                <div>
+                    {% if student.match_score|default(0) >= 80 %}
+                        <span class="match-label">Excellent Match</span>
+                    {% elif student.match_score|default(0) >= 60 %}
+                        <span class="match-label">Good Match</span>
+                    {% elif student.match_score|default(0) >= 40 %}
+                        <span class="match-label">Moderate Match</span>
+                    {% else %}
+                        <span class="match-label">Low Match</span>
+                    {% endif %}
+                </div>
+
+                <details>
+                    <summary>View Score Breakdown</summary>
+                    <ul class="score-list">
+                        <li>
+                            <span>Skill Match</span>
+                            <strong>{{ student.score_breakdown.skill_match|default(0) }}/40</strong>
+                        </li>
+                        <li>
+                            <span>Availability</span>
+                            <strong>{{ student.score_breakdown.availability|default(0) }}/30</strong>
+                        </li>
+                        <li>
+                            <span>Department & Semester</span>
+                            <strong>{{ student.score_breakdown.academic|default(0) }}/10</strong>
+                        </li>
+                        <li>
+                            <span>Mutual Skill Exchange</span>
+                            <strong>{{ student.score_breakdown.mutual_exchange|default(0) }}/10</strong>
+                        </li>
+                        <li>
+                            <span>Profile Completeness</span>
+                            <strong>{{ student.score_breakdown.profile|default(0) }}/10</strong>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+
+            <div class="section">
+                <h4>Skills Matching Your Goals</h4>
+                <div class="tags">
+                    {% for skill in student.matched_skills %}
+                        <span class="tag green">
+                            {{ skill.skill_name }}
+                        </span>
+                    {% else %}
+                        <span class="tag gray">No matching skills</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section">
+                <h4>Other Skills They Can Teach</h4>
+                <div class="tags">
+                    {% for skill in student.teaching_skills %}
+                        {% if skill.skill_id not in student.matched_skills|map(attribute='skill_id')|list %}
+                            <span class="tag">{{ skill.skill_name }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="tag gray">Not specified</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section">
+                <h4>Skills They Want to Learn</h4>
+                <div class="tags">
+                    {% for skill in student.learning_skills %}
+                        <span class="tag gray">{{ skill.skill_name }}</span>
+                    {% else %}
+                        <span class="tag gray">Not specified</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section">
+                <h4>Common Availability</h4>
+                <div>
+                    {% for slot in student.common_availability %}
+                        <span class="availability-slot">
+                            {{ slot.day }}: {{ slot.start }} - {{ slot.end }}
+                        </span>
+                    {% else %}
+                        <span class="tag gray">No common availability found</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if student.matched_skills %}
+            <form
+                class="request-form"
+                method="POST"
+                action="{{ url_for(
+                    'send_learning_request',
+                    partner_id=student.student_id,
+                    skill_id=student.matched_skills[0].skill_id
+                ) }}"
+            >
+                <label for="skill-{{ student.student_id }}">
+                    <h4 style="margin-bottom: 10px;">Choose a Skill</h4>
+                </label>
+
+                <select
+                    id="skill-{{ student.student_id }}"
+                    name="skill_id"
+                    onchange="updateRequestAction(this)"
+                >
+                    {% for skill in student.matched_skills %}
+                    <option value="{{ skill.skill_id }}">
+                        {{ skill.skill_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="request-btn">
+                    Send Learning Request
+                </button>
+            </form>
+            {% endif %}
+
+        </article>
+
+        {% else %}
+
+        <div class="empty">
+            <h3>No Matches Found</h3>
+            <p>
+                Abhi tumhari learning skills se match karta hua koi student
+                nahi mila. Apni learning skills add karo aur dobara check karo.
+            </p>
+            <a href="{{ url_for('learn_skills') }}">Add Learning Skills</a>
+        </div>
+
+        {% endfor %}
+
+        <div class="empty hidden" id="noSearchResults">
+            <h3>No Students Found</h3>
+            <p>Try searching with a different name, department, or skill.</p>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    Campus Skill Exchange Platform
+</footer>
+
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const cards = document.querySelectorAll(".student-card");
+    const noSearchResults = document.getElementById("noSearchResults");
+
+    searchInput.addEventListener("input", function () {
+        const query = this.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+            const searchText = card.dataset.search || "";
+            const matches = searchText.includes(query);
+
+            card.classList.toggle("hidden", !matches);
+
+            if (matches) {
+                visibleCount++;
+            }
+        });
+
+        noSearchResults.classList.toggle(
+            "hidden",
+            visibleCount !== 0 || cards.length === 0
+        );
+    });
+
+    function updateRequestAction(select) {
+        const form = select.closest("form");
+        const partnerId = form.action.split("/").filter(Boolean);
+        const skillId = select.value;
+
+        // Keep the existing Flask route URL pattern.
+        // Replace the final two URL parts with partner ID and selected skill ID.
+        const baseUrl = form.action.substring(
+            0,
+            form.action.lastIndexOf("/")
+        );
+
+        const partnerBase = baseUrl.substring(
+            0,
+            baseUrl.lastIndexOf("/")
+        );
+
+        form.action = partnerBase + "/" + skillId;
+    }
+</script>
+
+</body>
+</html>
+```
