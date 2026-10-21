@@ -2586,4 +2586,26 @@ padding: 0 14px;
     transform: translateY(-2px);
 }
 
+.custom-skill-box {
+    margin: 20px 0;
+    padding: 18px;
+    background: #f4f2ff;
+    border: 1px solid #ded9ff;
+    border-radius: 12px;
+}
+
+.custom-skill-box p {
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.custom-skill-box .add-skill-btn {
+    padding: 10px 16px;
+    background: #5146d8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 

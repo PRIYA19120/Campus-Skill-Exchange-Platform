@@ -3,41 +3,117 @@ from datetime import datetime
 from database import db
 
 
+# ==========================================
+# STUDENT MODEL
+# ==========================================
 class Student(db.Model):
     __tablename__ = "students"
 
-    student_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    department = db.Column(db.String(100))
-    semester = db.Column(db.String(30))
-    bio = db.Column(db.Text)
+    student_id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    student_skills = db.relationship(
+    name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=False
+    )
+
+    password = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    department = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
+    semester = db.Column(
+        db.String(50),
+        nullable=True
+    )
+
+    bio = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    # Student ke teaching aur learning skills
+    skills = db.relationship(
         "StudentSkill",
         back_populates="student",
+        lazy=True,
         cascade="all, delete-orphan"
     )
 
+    # Student dwara bheji gayi requests
+    sent_requests = db.relationship(
+        "LearningRequest",
+        foreign_keys="LearningRequest.student_id",
+        back_populates="sender",
+        lazy=True
+    )
 
-class Skill(db.Model):
-    __tablename__ = "skills"
-
-    skill_id = db.Column(db.Integer, primary_key=True)
-    skill_name = db.Column(db.String(100), unique=True, nullable=False)
-    category = db.Column(db.String(100))
-
-    student_skills = db.relationship(
-        "StudentSkill",
-        back_populates="skill"
+    # Student ko mili requests
+    received_requests = db.relationship(
+        "LearningRequest",
+        foreign_keys="LearningRequest.partner_id",
+        back_populates="receiver",
+        lazy=True
     )
 
 
+# ==========================================
+# SKILL MODEL
+# ==========================================
+class Skill(db.Model):
+    __tablename__ = "skills"
+    skill_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    
+
+    skill_name = db.Column(
+        db.String(100),
+        unique=True,
+        nullable=False
+    )
+
+    category = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
+    student_skills = db.relationship(
+        "StudentSkill",
+        back_populates="skill",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    learning_requests = db.relationship(
+        "LearningRequest",
+        back_populates="skill",
+        lazy=True
+    )
+
+
+# ==========================================
+# STUDENT SKILL MODEL
+# ==========================================
 class StudentSkill(db.Model):
     __tablename__ = "student_skills"
+    student_skill_id = db.Column(
+    db.Integer,
+    primary_key=True,
+    autoincrement=True
+)
 
-    student_skill_id = db.Column(db.Integer, primary_key=True)
 
     student_id = db.Column(
         db.Integer,
@@ -51,11 +127,17 @@ class StudentSkill(db.Model):
         nullable=False
     )
 
-    skill_type = db.Column(db.String(10), nullable=False)
+    # teach = student skill sikha sakta hai
+    # learn = student skill seekhna chahta hai
+    skill_type = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
 
     student = db.relationship(
         "Student",
-        back_populates="student_skills"
+        back_populates="skills"
     )
 
     skill = db.relationship(
@@ -64,172 +146,100 @@ class StudentSkill(db.Model):
     )
 
 
-class LearningRequest(db.Model):
-    __tablename__ = "learning_requests"
-
-    request_id = db.Column(db.Integer, primary_key=True)
-
-    # Student who sends the request
-    student_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=False
-    )
-
-    # Student who receives the request
-    # Nullable temporarily for compatibility with existing records
-    partner_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=True
-    )
-
-    skill_id = db.Column(
-        db.Integer,
-        db.ForeignKey("skills.skill_id"),
-        nullable=False
-    )
-
-    status = db.Column(
-        db.String(20),
-        nullable=False,
-        default="Pending"
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
-
-
-class Match(db.Model):
-    __tablename__ = "matches"
-
-    match_id = db.Column(db.Integer, primary_key=True)
-
-    student_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=False
-    )
-
-    partner_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=False
-    )
-
-    skill_id = db.Column(
-        db.Integer,
-        db.ForeignKey("skills.skill_id"),
-        nullable=False
-    )
-
-    match_score = db.Column(
-        db.Float,
-        nullable=False,
-        default=0
-    )
-
-    status = db.Column(
-        db.String(20),
-        nullable=False,
-        default="Pending"
-    )
-
-
-class LearningSession(db.Model):
-    __tablename__ = "sessions"
-
-    session_id = db.Column(db.Integer, primary_key=True)
-
-    match_id = db.Column(
-        db.Integer,
-        db.ForeignKey("matches.match_id"),
-        nullable=False
-    )
-
-    start_time = db.Column(db.DateTime)
-    end_time = db.Column(db.DateTime)
-
-    status = db.Column(
-        db.String(20),
-        nullable=False,
-        default="Scheduled"
-    )
-
-
-class Rating(db.Model):
-    __tablename__ = "ratings"
-
-    rating_id = db.Column(db.Integer, primary_key=True)
-
-    session_id = db.Column(
-        db.Integer,
-        db.ForeignKey("sessions.session_id"),
-        nullable=False
-    )
-
-    student_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=False
-    )
-
-    rating = db.Column(db.Integer, nullable=False)
-    feedback = db.Column(db.Text)
-
-
-class Message(db.Model):
-    __tablename__ = "messages"
-
-    message_id = db.Column(db.Integer, primary_key=True)
-
-    sender_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=False
-    )
-
-    receiver_id = db.Column(
-        db.Integer,
-        db.ForeignKey("students.student_id"),
-        nullable=False
-    )
-
-    message = db.Column(db.Text, nullable=False)
-
-    sent_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
-
+# ==========================================
+# AVAILABILITY MODEL
+# ==========================================
 
 class Availability(db.Model):
     __tablename__ = "availability"
 
-    availability_id = db.Column(
+    availability_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.student_id"),
+        nullable=False
+    )
+    day_of_week = db.Column(db.String(15), nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    student = db.relationship(
+        "Student",
+        backref=db.backref("availability_slots", lazy=True)
+    )
+# ==========================================
+# LEARNING REQUEST MODEL
+# ==========================================
+class LearningRequest(db.Model):
+    __tablename__ = "learning_requests"
+
+    # Unique request ID
+    request_id = db.Column(
         db.Integer,
         primary_key=True
     )
 
+    # Request bhejne wala student
     student_id = db.Column(
         db.Integer,
         db.ForeignKey("students.student_id"),
         nullable=False
     )
 
-    day_of_week = db.Column(
-        db.String(15),
+    # Request receive karne wala student
+    partner_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.student_id"),
         nullable=False
     )
 
-    start_time = db.Column(
-        db.Time,
+    # Seekhi jaane wali skill
+    skill_id = db.Column(
+        db.Integer,
+        db.ForeignKey("skills.skill_id"),
         nullable=False
     )
 
-    end_time = db.Column(
-        db.Time,
-        nullable=False
+    # Pending, Accepted ya Rejected
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="Pending"
     )
+
+    # Request creation date and time
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    # Request sender
+    sender = db.relationship(
+        "Student",
+        foreign_keys=[student_id],
+        back_populates="sent_requests"
+    )
+
+    # Request receiver
+    receiver = db.relationship(
+        "Student",
+        foreign_keys=[partner_id],
+        back_populates="received_requests"
+    )
+
+    # Requested skill
+    skill = db.relationship(
+        "Skill",
+        back_populates="learning_requests"
+    )
+
+    def __repr__(self):
+        return (
+            f"<LearningRequest "
+            f"request_id={self.request_id}, "
+            f"student_id={self.student_id}, "
+            f"partner_id={self.partner_id}, "
+            f"skill_id={self.skill_id}, "
+            f"status={self.status}>"
+        )
