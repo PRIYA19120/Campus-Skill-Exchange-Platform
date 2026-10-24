@@ -7,7 +7,7 @@ db = SQLAlchemy()
 
 def init_db(app):
     host = os.getenv("DB_HOST")
-    port = os.getenv("DB_PORT", "3306")
+    port = os.getenv("DB_PORT", "12728")
     name = os.getenv("DB_NAME")
     user = os.getenv("DB_USER")
     password = os.getenv("DB_PASSWORD")
@@ -18,10 +18,11 @@ def init_db(app):
         )
 
     password = quote_plus(password)
+    ca_path = os.path.join(app.root_path, "ca.pem")
 
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}"
-        "?ssl=true"
+        f"?ssl_ca={quote_plus(ca_path)}"
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
