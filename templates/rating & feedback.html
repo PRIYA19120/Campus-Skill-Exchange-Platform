@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rating & Feedback | Campus Skill Exchange</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f1f5fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .feedback-container {
+            width: 100%;
+            max-width: 650px;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(28, 55, 90, 0.10);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #173b75;
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            color: #667085;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .welcome {
+            background: #eef5ff;
+            padding: 15px;
+            border-radius: 10px;
+            color: #2459a9;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #26364b;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .rating-options {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .rating-options input {
+            display: none;
+        }
+
+        .rating-options label {
+            font-size: 42px;
+            color: #d1d9e6;
+            cursor: pointer;
+            margin: 0;
+            transition: color 0.2s;
+        }
+
+        .rating-options label:hover,
+        .rating-options label:hover ~ label,
+        .rating-options input:checked ~ label {
+            color: #f5b800;
+        }
+
+        .rating-help {
+            color: #667085;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #d5deeb;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 15px;
+            outline: none;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            border-color: #3478d4;
+            box-shadow: 0 0 0 3px rgba(52, 120, 212, 0.12);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #2459a9;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #173b75;
+        }
+
+        .message {
+            padding: 13px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #e8f7ed;
+            color: #187443;
+        }
+
+        .error {
+            background: #feecec;
+            color: #b42318;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 22px;
+            color: #2459a9;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .feedback-container {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .rating-options label {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="feedback-container">
+
+        <div class="header">
+            <h1>Rating & Feedback</h1>
+            <p>Help us improve the Campus Skill Exchange experience.</p>
+        </div>
+
+        <div class="welcome">
+            Welcome, {{ user_name }}! Share your learning experience with us.
+        </div>
+
+        {% if success %}
+            <div class="message success">{{ success }}</div>
+        {% endif %}
+
+        {% if error %}
+            <div class="message error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('rating_feedback') }}">
+
+            <div class="form-group">
+                <label>How would you rate your experience?</label>
+
+                <div class="rating-options">
+                    <input type="radio" id="star5" name="rating" value="5" required>
+                    <label for="star5" title="5 stars">★</label>
+
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 stars">★</label>
+
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 stars">★</label>
+
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 stars">★</label>
+
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 star">★</label>
+                </div>
+
+                <p class="rating-help">1 star = Poor &nbsp; | &nbsp; 5 stars = Excellent</p>
+            </div>
+
+            <div class="form-group">
+                <label for="feedback">Your Feedback</label>
+
+                <textarea
+                    id="feedback"
+                    name="feedback"
+                    placeholder="Tell us about your experience, suggestions, or improvements..."
+                    maxlength="1000"
+                    required
+                ></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Submit Feedback
+            </button>
+
+        </form>
+
+       
+        

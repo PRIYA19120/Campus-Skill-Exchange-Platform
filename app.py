@@ -828,6 +828,7 @@ def send_learning_request(partner_id, skill_id):
 
 
 # Show requests received by the logged-in student.
+
 @app.route("/learning-requests")
 def learning_requests():
     student_id = session.get("user_id")
@@ -835,11 +836,16 @@ def learning_requests():
     if not student_id:
         return redirect(url_for("login"))
 
+    print("LOGGED-IN STUDENT ID:", student_id)
+
     received_requests = LearningRequest.query.filter_by(
         partner_id=student_id
     ).order_by(
         LearningRequest.created_at.desc()
     ).all()
+
+    print("RECEIVED REQUEST COUNT:", len(received_requests))
+    print("RECEIVED REQUEST IDS:", [req.request_id for req in received_requests])
 
     incoming = []
 
@@ -850,9 +856,7 @@ def learning_requests():
         incoming.append({
             "request_id": req.request_id,
             "sender_name": sender.name if sender else "Unknown student",
-            "sender_department": (
-                sender.department if sender else "Not specified"
-            ),
+            "sender_department": sender.department if sender else "Not specified",
             "skill_name": skill.skill_name if skill else "Unknown skill",
             "status": req.status,
             "created_at": req.created_at
@@ -862,6 +866,7 @@ def learning_requests():
         "learning_requests.html",
         incoming=incoming
     )
+
 
 
 # Only the receiving student can accept or reject a request.
@@ -1275,6 +1280,31 @@ def delete_availability(availability_id):
             )
 
     return redirect(url_for("availability"))
+@app.route("/rating-feedback", methods=["GET", "POST"])
+def rating_feedback():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    success = None
+    error = None
+
+    if request.method == "POST":
+        rating = request.form.get("rating", "").strip()
+        feedback = request.form.get("feedback", "").strip()
+
+        if not rating or not rating.isdigit() or not 1 <= int(rating) <= 5:
+            error = "Please select a rating from 1 to 5 stars."
+        elif not feedback:
+            error = "Please enter your feedback."
+        else:
+            success = "Thank you! Your feedback has been submitted."
+
+    return render_template(
+        "rating_feedback.html",
+        success=success,
+        error=error,
+        user_name=session.get("full_name", "")
+    )
 
 
 print("\n--- REGISTERED ROUTES ---")
