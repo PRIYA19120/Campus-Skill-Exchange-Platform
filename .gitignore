@@ -3,3 +3,7 @@ Campus Skill Exchange Platform(backend)/.env
 
 .env
 **/.env
+
+__pycache__/
+*.py[cod]
+
