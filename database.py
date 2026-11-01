@@ -1,11 +1,14 @@
+
 import os
 from urllib.parse import quote_plus
+from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-
 def init_db(app):
+    load_dotenv(os.path.join(app.root_path, ".env"))
+
     host = os.getenv("DB_HOST")
     port = os.getenv("DB_PORT", "12728")
     name = os.getenv("DB_NAME")
@@ -24,6 +27,7 @@ def init_db(app):
         f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}"
         f"?ssl_ca={quote_plus(ca_path)}"
     )
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)

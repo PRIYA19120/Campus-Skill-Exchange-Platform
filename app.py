@@ -809,6 +809,10 @@ def send_learning_request(partner_id, skill_id):
 
         db.session.add(learning_request)
         db.session.commit()
+        print("DEBUG: SEND REQUEST FUNCTION CALLED", flush=True)
+        print("REQUEST SENDER ID:", student_id)
+        print("REQUEST RECEIVER ID:", partner_id)
+        print("REQUEST SAVED ID:", learning_request.request_id)
 
         flash(
             f"Learning request sent to {partner.name} "
@@ -1314,4 +1318,7 @@ print("-------------------------\n")
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+
     app.run(debug=True)
