@@ -160,6 +160,7 @@ def dashboard():
     )
 
 
+
 @app.route("/profile")
 def profile():
     if not session.get("user_id"):
@@ -171,6 +172,32 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
+    # Get all ratings received by the logged-in student
+    received_reviews = (
+        db.session.query(RatingFeedback, Student.name)
+        .join(
+            Student,
+            Student.student_id == RatingFeedback.reviewer_id
+        )
+        .filter(
+            RatingFeedback.reviewed_student_id == student.student_id
+        )
+        .order_by(RatingFeedback.created_at.desc())
+        .all()
+    )
+
+    # Calculate average rating
+    average_rating = (
+        db.session.query(db.func.avg(RatingFeedback.rating))
+        .filter(
+            RatingFeedback.reviewed_student_id == student.student_id
+        )
+        .scalar()
+        or 0
+    )
+
+    total_reviews = len(received_reviews)
+
     return render_template(
         "profile.html",
         full_name=student.name,
@@ -179,8 +206,12 @@ def profile():
         department=student.department or "",
         semester=student.semester or "",
         bio=student.bio or "",
-        profile_picture=session.get("profile_picture")
+        profile_picture=session.get("profile_picture"),
+        received_reviews=received_reviews,
+        average_rating=round(float(average_rating), 1),
+        total_reviews=total_reviews
     )
+
 
 
 @app.route("/edit-profile", methods=["GET", "POST"])

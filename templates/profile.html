@@ -296,6 +296,62 @@
             </div>
 
 
+            
+            <!-- Received Ratings & Feedback -->
+            <div class="profile-skills">
+
+                <h3>⭐ Ratings & Feedback</h3>
+
+                <div class="overview-box">
+
+                    <div>
+                        <strong>{{ average_rating or 0 }}</strong>
+                        <span>Average Rating</span>
+                    </div>
+
+                    <div>
+                        <strong>{{ total_reviews or 0 }}</strong>
+                        <span>Total Reviews</span>
+                    </div>
+
+                </div>
+
+                <div class="received-reviews">
+
+                    {% if received_reviews %}
+
+                        {% for review, reviewer_name in received_reviews %}
+
+                            <div class="review-card">
+
+                                <h4>{{ reviewer_name }}</h4>
+
+                                <p>
+                                    ⭐ {{ review.rating }}/5
+                                </p>
+
+                                <p>{{ review.feedback }}</p>
+
+                                <small>
+                                    {{ review.created_at.strftime('%d %b %Y') }}
+                                </small>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p>No feedback received yet.</p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+
         </div>
 
 
