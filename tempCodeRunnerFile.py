@@ -1,3 +1,1 @@
-
-)
-import os
+init_db(app)

@@ -315,6 +315,133 @@
                 font-size: 27px;
             }
         }
+
+                /* Career Skill Analysis */
+
+        .skill-analysis-results {
+            margin: 35px auto;
+            padding: 25px;
+            max-width: 1100px;
+        }
+
+        .progress-card,
+        .skill-result-card {
+            background: #ffffff;
+            padding: 22px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 14px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2563eb;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        .skill-result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-top: 10px;
+            background: #f3f4f6;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 650px) {
+            .skill-result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Career Selection Section */
+
+        .career-selection,
+        .custom-career {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .career-selection h2,
+        .custom-career h2 {
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .career-selection p,
+        .custom-career p {
+            color: #64748b;
+            margin-bottom: 18px;
+        }
+
+        .career-selection select,
+        .custom-career input,
+        .custom-career textarea {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .custom-career textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .career-selection button,
+        .custom-career button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .career-selection button:hover,
+        .custom-career button:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 650px) {
+            .career-selection,
+            .custom-career {
+                margin: 18px 12px;
+                padding: 18px;
+            }
+        }
+
     </style>
 </head>
 
@@ -346,143 +473,139 @@
             </p>
         </section>
 
-        <h2 class="section-title">Your Skill Overview</h2>
+        <section class="career-selection">
 
-        <section class="overview">
+            <h2>Choose Your Career Goal</h2>
 
-            <div class="overview-card">
-                <p>Current Skills</p>
-                <h2>4</h2>
-                <small>Skills you already know</small>
-            </div>
+            <p>Select a career to discover the skills required for it.</p>
 
-            <div class="overview-card">
-                <p>Skills to Improve</p>
-                <h2>3</h2>
-                <small>Areas for further learning</small>
-            </div>
+            <form method="GET" action="{{ url_for('skill_gap_analysis') }}">
+                <select name="career" required>
+                    {% for career in careers %}
+                        <option value="{{ career }}"
+                            {% if career == selected_career %}selected{% endif %}>
+                            {{ career }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-            <div class="overview-card">
-                <p>Learning Progress</p>
-                <h2>65%</h2>
-                <small>Illustrative progress estimate</small>
-            </div>
-
+                <button type="submit">Analyze My Skills</button>
+            </form>
         </section>
 
-        <section class="analysis-layout">
+        <div class="custom-career">
+            <h2>Can't Find Your Career?</h2>
 
-            <div class="panel">
-                <h2>Current Skill Levels</h2>
-                <p class="panel-description">
-                    Example overview of your existing skills and
-                    their current proficiency levels.
-                </p>
+            <p>Add your own career goal and required skills.</p>
 
-                <div class="skill-item">
-                    <div class="skill-info">
-                        <h3>Python Programming</h3>
-                        <span>80%</span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-fill" style="width: 80%;"></div>
-                    </div>
-                </div>
+            <form method="POST" action="{{ url_for ('skill_gap_analysis') }}">
+                <input
+                    type="text"
+                    name="custom_career"
+                    placeholder="Enter career name (e.g. Ethical Hacker)"
+                    required
+                >
 
-                <div class="skill-item">
-                    <div class="skill-info">
-                        <h3>HTML & CSS</h3>
-                        <span>70%</span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-fill green" style="width: 70%;"></div>
-                    </div>
-                </div>
+                <textarea
+                    name="custom_skills"
+                    placeholder="Enter required skills separated by commas (e.g. Python, Linux, Networking, Security)"
+                    required
+                ></textarea>
 
-                <div class="skill-item">
-                    <div class="skill-info">
-                        <h3>Data Structures</h3>
-                        <span>45%</span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-fill orange" style="width: 45%;"></div>
-                    </div>
-                </div>
+                <button type="submit">Analyze Custom Career</button>
+            </form>
+        </div>
 
-                <div class="skill-item">
-                    <div class="skill-info">
-                        <h3>Machine Learning</h3>
-                        <span>30%</span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-fill purple" style="width: 30%;"></div>
-                    </div>
+        <section class="skill-analysis-results">
+
+        <h2>Your Career Skill Progress</h2>
+
+        <p class="panel-description">
+            Your skills are compared with the requirements of
+            {{ selected_career }}.
+        </p>
+
+        <div class="progress-card">
+
+            <h3>Overall Skill Coverage</h3>
+
+            <div class="progress-info">
+                <span>{{ completed_count }} / {{ total_skills }} Skills</span>
+                <strong>{{ progress }}%</strong>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill"
+                    data-progress="{{ progress | default(0) }}">
                 </div>
             </div>
 
-            <div class="panel">
-                <h2>Identified Skill Gaps</h2>
-                <p class="panel-description">
-                    Example areas you could focus on next.
-                </p>
+        </div>
 
-                <div class="gap-list">
+        <div class="skill-result-grid">
 
-                    <div class="gap-item">
-                        <div class="gap-top">
-                            <h3>Data Structures</h3>
-                            <span class="priority">HIGH PRIORITY</span>
+            <div class="skill-result-card">
+                <h3>Skills You Have</h3>
+
+                {% if completed_skills %}
+                    {% for skill in completed_skills %}
+                        <div class="skill-item">
+                            <span>{{ skill }}</span>
+                            <span>✓</span>
                         </div>
-                        <p>
-                            Practise stacks, queues, linked lists,
-                            searching and sorting.
-                        </p>
-                    </div>
-
-                    <div class="gap-item">
-                        <div class="gap-top">
-                            <h3>Machine Learning</h3>
-                            <span class="priority medium">MEDIUM</span>
-                        </div>
-                        <p>
-                            Learn model basics, data preparation
-                            and model evaluation.
-                        </p>
-                    </div>
-
-                    <div class="gap-item">
-                        <div class="gap-top">
-                            <h3>Database Skills</h3>
-                            <span class="priority low">NEXT STEP</span>
-                        </div>
-                        <p>
-                            Practise SQL queries, table relationships
-                            and database operations.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="recommendation">
-                    <h3>Recommended Next Step</h3>
-                    <p>
-                        Find a student who can teach you a skill
-                        you want to improve, and exchange knowledge
-                        by teaching one of your own skills.
-                    </p>
-
-                    <a href="{{ url_for('match_result') }}">
-                        Find Learning Partners
-                    </a>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No matching skills found yet.</p>
+                {% endif %}
             </div>
 
-        </section>
+            <div class="skill-result-card">
+                <h3>Skills You Need to Learn</h3>
+
+                {% if missing_skills %}
+                    {% for skill in missing_skills %}
+                        <div class="skill-item">
+                            <span>{{ skill }}</span>
+                            <span>○</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>All required skills are listed in your Teach skills!</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <h2 class="section-title">Your Skill Overview</h2>
+
+    <section class="overview">
+
+        <div class="overview-card">
+            <p>Current Skills</p>
+            <h2>{{ current_skills }}</h2>
+            <small>Skills listed in your Teach profile</small>
+        </div>
+
+        <div class="overview-card">
+            <p>Skills to Improve</p>
+            <h2>{{ missing_skills|length }}</h2>
+            <small>Required skills not listed yet</small>
+        </div>
+
+        <div class="overview-card">
+            <p>Skill Coverage</p>
+            <h2>{{ progress }}%</h2>
+            <small>Matching skills for selected career</small>
+        </div>
+
+    </section>
 
         <p class="note">
-            Note: This page currently uses sample skills and percentages
-            for the interface. Connect it to your saved profile and
-            skill-matching logic to show personalised results.
+            Skill coverage is calculated using the skills listed in
+            your Teach profile. It does not represent actual proficiency.
         </p>
 
     </main>
@@ -490,6 +613,17 @@
     <footer class="footer">
         Campus Skill Exchange · Learn Together, Grow Together
     </footer>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const bar = document.querySelector(".progress-fill");
+
+    if (bar) {
+        const progress = Number(bar.dataset.progress) || 0;
+        bar.style.width = Math.min(100, Math.max(0, progress)) + "%";
+    }
+});
+</script>
 
 </body>
 </html>

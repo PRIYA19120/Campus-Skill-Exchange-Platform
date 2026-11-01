@@ -1,14 +1,13 @@
-
-from flask import (
-    Flask,
-    render_template,
-    send_from_directory,
-    request,
-    session,
-    redirect,
-    url_for,
-    flash
+from flask import( 
+    Flask, 
+    render_template, 
+    request, 
+    session, 
+    redirect, 
+    url_for
 )
+
+
 import os
 import csv
 from datetime import datetime
@@ -36,6 +35,8 @@ from routes.skills import skills_bp
 
 app = Flask(__name__)
 app.secret_key = "campus_skill_exchange"
+
+init_db(app)
 
 UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -1178,20 +1179,172 @@ def logout():
     session.clear()
     return redirect(url_for("home"))
 
+CAREER_SKILLS = {
+    # Software Development
+    "Frontend Developer": ["HTML", "CSS", "JavaScript", "React", "Git"],
+    "Backend Developer": ["Python", "Java", "SQL", "APIs", "Git"],
+    "Full Stack Developer": ["HTML", "CSS", "JavaScript", "React", "Python", "SQL"],
+    "Python Developer": ["Python", "SQL", "Git", "Data Structures"],
+    "Java Developer": ["Java", "OOP", "Data Structures", "SQL"],
+    "Software Engineer": ["Python", "Java", "DSA", "OOP", "Git"],
+    "Android Developer": ["Java", "Kotlin", "Android", "SQL"],
+    "iOS Developer": ["Swift", "iOS", "Xcode", "UI Design"],
+    "Game Developer": ["C++", "C#", "Unity", "3D Basics"],
 
-@app.route("/skill-gap-analysis")
+    # Cybersecurity and Networking
+    "Cybersecurity Analyst": ["Networking", "Linux", "Python", "Cybersecurity"],
+    "SOC Analyst": ["Networking", "Linux", "SIEM", "Cybersecurity"],
+    "Security Engineer": ["Networking", "Linux", "Python", "Security"],
+    "Network Engineer": ["Networking", "Routing", "Switching", "Linux"],
+    "Digital Forensics Analyst": ["Linux", "Networking", "Forensics", "Security"],
+
+    # Data and AI
+    "Data Analyst": ["Python", "SQL", "Excel", "Statistics"],
+    "Data Scientist": ["Python", "SQL", "Statistics", "Machine Learning"],
+    "Data Engineer": ["Python", "SQL", "ETL", "Databases"],
+    "AI Engineer": ["Python", "Machine Learning", "Deep Learning", "AI"],
+    "Machine Learning Engineer": ["Python", "Statistics", "Machine Learning", "TensorFlow"],
+    "Business Intelligence Analyst": ["SQL", "Excel", "Power BI", "Data Visualization"],
+
+    # Cloud and DevOps
+    "Cloud Engineer": ["Linux", "Networking", "AWS", "Cloud Computing"],
+    "DevOps Engineer": ["Linux", "Git", "Docker", "CI/CD"],
+    "System Administrator": ["Linux", "Windows Server", "Networking", "Security"],
+    "Site Reliability Engineer": ["Linux", "Python", "Cloud Computing", "Monitoring"],
+
+    # Design and Creative Technology
+    "UI/UX Designer": ["Figma", "UI Design", "UX Research", "Prototyping"],
+    "Product Designer": ["Figma", "UI Design", "UX Research", "Prototyping"],
+    "Graphic Designer": ["Photoshop", "Illustrator", "Typography", "Design"],
+    "Animation Designer": ["Animation", "Blender", "3D Design", "Storyboarding"],
+
+    # Business and Management
+    "Business Analyst": ["Excel", "SQL", "Data Analysis", "Communication"],
+    "Product Manager": ["Product Management", "Communication", "Agile", "Analytics"],
+    "Project Manager": ["Project Management", "Agile", "Communication", "Planning"],
+    "Digital Marketing Analyst": ["SEO", "Google Analytics", "Excel", "Marketing"],
+    "IT Consultant": ["Networking", "Databases", "Cloud Computing", "Communication"]
+}
+
+SKILL_ALIASES = {
+    "dsa": "data structures",
+    "data structures": "data structures",
+    "html & css": "html",
+    "javascript": "javascript"
+}
+
+@app.route("/skill-gap-analysis", methods=["GET", "POST"])
 def skill_gap_analysis():
+
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
-    return render_template("skill_gap_analysis.html")
+    # Custom careers saved in the current user's session
+    custom_careers = session.get("custom_careers", {})
 
+    # Handle custom career form
+    if request.method == "POST":
 
-# Initialize database and register blueprints.
-init_db(app)
-app.register_blueprint(auth_bp)
-app.register_blueprint(skills_bp)
+        career_name = request.form.get(
+            "custom_career", ""
+        ).strip()
 
+        skills_input = request.form.get(
+            "custom_skills", ""
+        )
+
+        custom_skills = list(dict.fromkeys(
+            skill.strip()
+            for skill in skills_input.split(",")
+            if skill.strip()
+        ))
+
+        if not career_name or not custom_skills:
+            return redirect(url_for("skill_gap_analysis"))
+
+        if len(career_name) > 100 or len(custom_skills) > 50:
+            return redirect(url_for("skill_gap_analysis"))
+
+        custom_careers[career_name] = custom_skills
+        session["custom_careers"] = custom_careers
+
+        return redirect(
+            url_for(
+                "skill_gap_analysis",
+                career=career_name
+            )
+        )
+
+    # Combine predefined and custom careers
+    all_careers = {
+        **CAREER_SKILLS,
+        **custom_careers
+    }
+
+    selected_career = request.args.get(
+        "career", "Frontend Developer"
+    )
+
+    if selected_career not in all_careers:
+        selected_career = "Frontend Developer"
+
+    required_skills = all_careers[selected_career]
+
+    # Fetch student's teaching skills from database
+    student_skills = (
+        db.session.query(Skill.skill_name)
+        .join(
+            StudentSkill,
+            Skill.skill_id == StudentSkill.skill_id
+        )
+        .filter(
+            StudentSkill.student_id == session["user_id"],
+            StudentSkill.skill_type == "teach"
+        )
+        .all()
+    )
+
+    known_skills = {
+        SKILL_ALIASES.get(
+            skill_name.strip().lower(),
+            skill_name.strip().lower()
+        )
+        for (skill_name,) in student_skills
+        if skill_name
+    }
+
+    completed_skills = [
+        skill for skill in required_skills
+        if SKILL_ALIASES.get(skill.lower(), skill.lower())
+        in known_skills
+    ]
+
+    missing_skills = [
+        skill for skill in required_skills
+        if SKILL_ALIASES.get(skill.lower(), skill.lower())
+        not in known_skills
+    ]
+
+    total_skills = len(required_skills)
+    completed_count = len(completed_skills)
+
+    progress = (
+        round((completed_count / total_skills) * 100)
+        if total_skills else 0
+    )
+
+    return render_template(
+        "skill_gap_analysis.html",
+        careers=list(all_careers.keys()),
+        selected_career=selected_career,
+        required_skills=required_skills,
+        completed_skills=completed_skills,
+        missing_skills=missing_skills,
+        total_skills=total_skills,
+        completed_count=completed_count,
+        progress=progress,
+        current_skills=len(known_skills)
+    )
 
 @app.route("/test-db")
 def test_db():
