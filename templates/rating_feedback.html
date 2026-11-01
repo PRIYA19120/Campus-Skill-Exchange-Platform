@@ -203,6 +203,27 @@
         <form method="POST" action="{{ url_for('rating_feedback') }}">
 
             <div class="form-group">
+                <label for="reviewed_student_id">
+                    Select Student to Rate
+                </label>
+
+                <select
+                    name="reviewed_student_id"
+                    id="reviewed_student_id"
+                    required
+                    style="width:100%; padding:14px; border:1px solid #d5deeb; border-radius:10px; font-size:15px;"
+                >
+                    <option value="">-- Select a Student --</option>
+
+                    {% for student in students %}
+                        <option value="{{ student.student_id }}">
+                            {{ student.name }} ({{ student.email }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label>How would you rate your experience?</label>
 
                 <div class="rating-options">

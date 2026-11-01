@@ -1368,7 +1368,7 @@ def rating_feedback():
         "rating_feedback.html",
         success=success,
         error=error,
-        user_name=session.get("full_name", ""),
+        user_name=session.get("user_name", "Student"),
         students=students
     )
 
