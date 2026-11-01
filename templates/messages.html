@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages | Campus Skill Exchange</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .messaging-container {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .message-form {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .message-form select,
+        .message-form textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d5deeb;
+            border-radius: 9px;
+            font-size: 15px;
+        }
+
+        .message-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .send-message-btn {
+            padding: 12px 22px;
+            background: #3157d5;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .message-card {
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 10px;
+            background: #f4f7ff;
+            border: 1px solid #e1e8f5;
+        }
+
+        .message-card p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .message-card small {
+            color: #77839a;
+        }
+
+        .success-message {
+            color: green;
+        }
+
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <main class="dashboard-content">
+
+        <a href="{{ url_for('dashboard') }}"
+           style="text-decoration:none; color:#3157d5;">
+            ← Back to Dashboard
+        </a>
+
+        <div class="messaging-container">
+
+            <h1>💬 Student Messages</h1>
+            <p>Connect and communicate with other students.</p>
+
+            {% if success %}
+                <p class="success-message">{{ success }}</p>
+            {% endif %}
+
+            {% if error %}
+                <p class="error-message">{{ error }}</p>
+            {% endif %}
+
+            <h3>Send a New Message</h3>
+
+            <form method="POST"
+                  action="{{ url_for('messages') }}"
+                  class="message-form">
+
+                <select name="receiver_id" required>
+                    <option value="">Select Student</option>
+
+                    {% for student in students %}
+                        <option value="{{ student.student_id }}">
+                            {{ student.name }} ({{ student.email }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <textarea name="message"
+                          placeholder="Write your message..."
+                          required></textarea>
+
+                <button type="submit" class="send-message-btn">
+                    Send Message
+                </button>
+
+            </form>
+
+            <hr>
+
+            <h3>Conversation History</h3>
+
+            {% if messages %}
+
+                {% for msg in messages %}
+
+                    <div class="message-card">
+
+                        {% if msg.sender_id == current_user_id %}
+                            <strong>You → Student #{{ msg.receiver_id }}</strong>
+                        {% else %}
+                            <strong>Student #{{ msg.sender_id }} → You</strong>
+                        {% endif %}
+
+                        <p>{{ msg.message }}</p>
+
+                        <small>
+                            {{ msg.sent_at.strftime('%d %b %Y, %I:%M %p') }}
+                        </small>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No messages yet. Start a conversation!</p>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

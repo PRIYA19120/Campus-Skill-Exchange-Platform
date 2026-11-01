@@ -26,7 +26,8 @@ from models import (
     StudentSkill,
     Availability,
     LearningRequest,
-    RatingFeedback
+    RatingFeedback,
+    Message
 )
 
 from routes.auth import auth_bp
@@ -1416,3 +1417,77 @@ if __name__ == "__main__":
         db.create_all()
 
     app.run(debug=True)
+
+
+
+# ==========================================
+# STUDENT MESSAGING SYSTEM
+# ==========================================
+
+@app.route("/messages", methods=["GET", "POST"])
+def messages():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    current_user_id = session["user_id"]
+    error = None
+    success = None
+
+    if request.method == "POST":
+        receiver_id = request.form.get("receiver_id", "").strip()
+        message_text = request.form.get("message", "").strip()
+
+        if not receiver_id.isdigit():
+            error = "Please select a student."
+        elif not message_text:
+            error = "Please enter a message."
+        else:
+            receiver_id = int(receiver_id)
+            receiver = db.session.get(Student, receiver_id)
+
+            if not receiver or receiver_id == current_user_id:
+                error = "Invalid student selected."
+            else:
+                try:
+                    new_message = Message(
+                        sender_id=current_user_id,
+                        receiver_id=receiver_id,
+                        message=message_text
+                    )
+
+                    db.session.add(new_message)
+                    db.session.commit()
+                    success = "Message sent successfully!"
+
+                except Exception:
+                    db.session.rollback()
+                    app.logger.exception("Message sending failed")
+                    error = "Unable to send message."
+
+    all_messages = (
+        Message.query
+        .filter(
+            db.or_(
+                Message.sender_id == current_user_id,
+                Message.receiver_id == current_user_id
+            )
+        )
+        .order_by(Message.sent_at.desc())
+        .all()
+    )
+
+    students = (
+        Student.query
+        .filter(Student.student_id != current_user_id)
+        .order_by(Student.name)
+        .all()
+    )
+
+    return render_template(
+        "messages.html",
+        messages=all_messages,
+        students=students,
+        current_user_id=current_user_id,
+        error=error,
+        success=success
+    )

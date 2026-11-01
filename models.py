@@ -295,3 +295,40 @@ class RatingFeedback(db.Model):
         default=datetime.utcnow,
         nullable=False
     )
+
+
+# ==========================================
+# MESSAGING MODEL
+# ==========================================
+
+class Message(db.Model):
+    __tablename__ = "messages"
+
+    message_id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    sender_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.student_id"),
+        nullable=False
+    )
+
+    receiver_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.student_id"),
+        nullable=False
+    )
+
+    message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    sent_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
