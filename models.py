@@ -243,3 +243,55 @@ class LearningRequest(db.Model):
             f"skill_id={self.skill_id}, "
             f"status={self.status}>"
         )
+
+
+# ==========================================
+# RATING AND FEEDBACK MODEL
+# ==========================================
+
+class RatingFeedback(db.Model):
+    __tablename__ = "rating_feedback"
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reviewer_id",
+            "reviewed_student_id",
+            name="unique_student_review"
+        ),
+    )
+
+    feedback_id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    # Student who gives the rating
+    reviewer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.student_id"),
+        nullable=False
+    )
+
+    # Student who receives the rating
+    reviewed_student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.student_id"),
+        nullable=False
+    )
+
+    rating = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    feedback = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )

@@ -25,7 +25,8 @@ from models import (
     Skill,
     StudentSkill,
     Availability,
-    LearningRequest
+    LearningRequest,
+    RatingFeedback
 )
 
 from routes.auth import auth_bp
@@ -1284,31 +1285,93 @@ def delete_availability(availability_id):
             )
 
     return redirect(url_for("availability"))
+
+
+
 @app.route("/rating-feedback", methods=["GET", "POST"])
 def rating_feedback():
+
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
     success = None
     error = None
 
+    current_user_id = session["user_id"]
+
     if request.method == "POST":
+
+        reviewed_student_id = request.form.get(
+            "reviewed_student_id", ""
+        ).strip()
+
         rating = request.form.get("rating", "").strip()
         feedback = request.form.get("feedback", "").strip()
 
-        if not rating or not rating.isdigit() or not 1 <= int(rating) <= 5:
+        if not reviewed_student_id.isdigit():
+            error = "Please select a student."
+
+        elif not rating.isdigit() or not 1 <= int(rating) <= 5:
             error = "Please select a rating from 1 to 5 stars."
+
         elif not feedback:
             error = "Please enter your feedback."
+
         else:
-            success = "Thank you! Your feedback has been submitted."
+            try:
+                reviewed_student_id = int(reviewed_student_id)
+
+                reviewed_student = db.session.get(
+                    Student, reviewed_student_id
+                )
+
+                if not reviewed_student:
+                    error = "Selected student does not exist."
+
+                elif reviewed_student_id == current_user_id:
+                    error = "You cannot rate your own profile."
+
+                else:
+                    existing_review = RatingFeedback.query.filter_by(
+                        reviewer_id=current_user_id,
+                        reviewed_student_id=reviewed_student_id
+                    ).first()
+
+                    if existing_review:
+                        existing_review.rating = int(rating)
+                        existing_review.feedback = feedback
+
+                    else:
+                        new_review = RatingFeedback(
+                            reviewer_id=current_user_id,
+                            reviewed_student_id=reviewed_student_id,
+                            rating=int(rating),
+                            feedback=feedback
+                        )
+
+                        db.session.add(new_review)
+
+                    db.session.commit()
+
+                    success = "Rating and feedback submitted successfully!"
+
+            except Exception:
+                db.session.rollback()
+                app.logger.exception("Rating submission failed")
+                error = "Could not submit feedback. Please try again."
+
+    students = Student.query.filter(
+        Student.student_id != current_user_id
+    ).order_by(Student.name).all()
 
     return render_template(
         "rating_feedback.html",
         success=success,
         error=error,
-        user_name=session.get("full_name", "")
+        user_name=session.get("full_name", ""),
+        students=students
     )
+
 
 
 print("\n--- REGISTERED ROUTES ---")
