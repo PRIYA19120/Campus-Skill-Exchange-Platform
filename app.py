@@ -1577,16 +1577,11 @@ def rating_feedback():
     )
 
 
-
-print("\n--- REGISTERED ROUTES ---")
-for rule in app.url_map.iter_rules():
-    print(rule, "->", rule.endpoint)
-print("-------------------------\n")
-
-
 # ==========================================
 # STUDENT MESSAGING SYSTEM
 # ==========================================
+
+
 
 @app.route("/messages", methods=["GET", "POST"])
 def messages():
@@ -1597,20 +1592,50 @@ def messages():
     error = None
     success = None
 
+    # Find only accepted learning requests involving current user
+    accepted_requests = LearningRequest.query.filter(
+        LearningRequest.status == "Accepted",
+        or_(
+            LearningRequest.student_id == current_user_id,
+            LearningRequest.partner_id == current_user_id
+        )
+    ).all()
+
+    # Get the other student's ID from each accepted request
+    accepted_partner_ids = set()
+
+    for req in accepted_requests:
+        if req.student_id == current_user_id:
+            accepted_partner_ids.add(req.partner_id)
+        else:
+            accepted_partner_ids.add(req.student_id)
+
+    # Handle sending a message
     if request.method == "POST":
-        receiver_id = request.form.get("receiver_id", "").strip()
-        message_text = request.form.get("message", "").strip()
+        receiver_id = request.form.get(
+            "receiver_id", ""
+        ).strip()
+
+        message_text = request.form.get(
+            "message", ""
+        ).strip()
 
         if not receiver_id.isdigit():
             error = "Please select a student."
+
         elif not message_text:
             error = "Please enter a message."
+
         else:
             receiver_id = int(receiver_id)
-            receiver = db.session.get(Student, receiver_id)
 
-            if not receiver or receiver_id == current_user_id:
-                error = "Invalid student selected."
+            # Security check: receiver must have an accepted request
+            if receiver_id not in accepted_partner_ids:
+                error = (
+                    "You can only message students "
+                    "whose learning request has been accepted."
+                )
+
             else:
                 try:
                     new_message = Message(
@@ -1621,6 +1646,7 @@ def messages():
 
                     db.session.add(new_message)
                     db.session.commit()
+
                     success = "Message sent successfully!"
 
                 except Exception:
@@ -1628,24 +1654,40 @@ def messages():
                     app.logger.exception("Message sending failed")
                     error = "Unable to send message."
 
-    all_messages = (
-        Message.query
-        .filter(
-            db.or_(
-                Message.sender_id == current_user_id,
-                Message.receiver_id == current_user_id
-            )
-        )
-        .order_by(Message.sent_at.desc())
-        .all()
-    )
+    # Show messages only with accepted partners
+    all_messages = []
 
-    students = (
-        Student.query
-        .filter(Student.student_id != current_user_id)
-        .order_by(Student.name)
-        .all()
-    )
+    if accepted_partner_ids:
+        all_messages = (
+            Message.query
+            .filter(
+                or_(
+                    and_(
+                        Message.sender_id == current_user_id,
+                        Message.receiver_id.in_(accepted_partner_ids)
+                    ),
+                    and_(
+                        Message.receiver_id == current_user_id,
+                        Message.sender_id.in_(accepted_partner_ids)
+                    )
+                )
+            )
+            .order_by(Message.sent_at.desc())
+            .all()
+        )
+
+    # Dropdown/list contains only accepted partners
+    students = []
+
+    if accepted_partner_ids:
+        students = (
+            Student.query
+            .filter(
+                Student.student_id.in_(accepted_partner_ids)
+            )
+            .order_by(Student.name)
+            .all()
+        )
 
     return render_template(
         "messages.html",
@@ -1656,8 +1698,17 @@ def messages():
         success=success
     )
 
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
+# ==========================================
+# APPLICATION START
+# ==========================================
 
+print("\n--- REGISTERED ROUTES ---")
+
+for rule in app.url_map.iter_rules():
+    print(rule, "->", rule.endpoint)
+
+print("-------------------------\n")
+
+
+if __name__ == "__main__":
     app.run(debug=True)

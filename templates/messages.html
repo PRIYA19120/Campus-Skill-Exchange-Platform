@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,6 +48,10 @@
             cursor: pointer;
         }
 
+        .send-message-btn:hover {
+            background: #2445b5;
+        }
+
         .message-card {
             padding: 16px;
             margin: 12px 0;
@@ -59,6 +63,7 @@
         .message-card p {
             margin: 10px 0;
             line-height: 1.6;
+            overflow-wrap: anywhere;
         }
 
         .message-card small {
@@ -67,10 +72,32 @@
 
         .success-message {
             color: green;
+            padding: 10px;
+            background: #eaf8ed;
+            border-radius: 8px;
         }
 
         .error-message {
             color: red;
+            padding: 10px;
+            background: #fff0f0;
+            border-radius: 8px;
+        }
+
+        .info-message {
+            color: #3157d5;
+            background: #f0f4ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .empty-message {
+            color: #77839a;
+            padding: 15px;
+            text-align: center;
+            background: #f7f8fb;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -81,49 +108,76 @@
 
     <main class="dashboard-content">
 
-        <a href="{{ url_for('dashboard') }}"
+        <a href="javascript:history.back()"
            style="text-decoration:none; color:#3157d5;">
-            ← Back to Dashboard
+            ← Go Back
         </a>
 
         <div class="messaging-container">
 
             <h1>💬 Student Messages</h1>
-            <p>Connect and communicate with other students.</p>
+
+            <p>
+                Connect and communicate with your learning partners.
+            </p>
+
+            <div class="info-message">
+                You can message only students who have an accepted
+                learning request with you.
+            </div>
 
             {% if success %}
-                <p class="success-message">{{ success }}</p>
+                <p class="success-message">
+                    {{ success }}
+                </p>
             {% endif %}
 
             {% if error %}
-                <p class="error-message">{{ error }}</p>
+                <p class="error-message">
+                    {{ error }}
+                </p>
             {% endif %}
 
             <h3>Send a New Message</h3>
 
-            <form method="POST"
-                  action="{{ url_for('messages') }}"
-                  class="message-form">
+            {% if students %}
 
-                <select name="receiver_id" required>
-                    <option value="">Select Student</option>
+                <form method="POST"
+                      action="{{ url_for('messages') }}"
+                      class="message-form">
 
-                    {% for student in students %}
-                        <option value="{{ student.student_id }}">
-                            {{ student.name }} ({{ student.email }})
-                        </option>
-                    {% endfor %}
-                </select>
+                    <select name="receiver_id" required>
 
-                <textarea name="message"
-                          placeholder="Write your message..."
-                          required></textarea>
+                        <option value="">Select Learning Partner</option>
 
-                <button type="submit" class="send-message-btn">
-                    Send Message
-                </button>
+                        {% for student in students %}
+                            <option value="{{ student.student_id }}">
+                                {{ student.name }} ({{ student.email }})
+                            </option>
+                        {% endfor %}
 
-            </form>
+                    </select>
+
+                    <textarea
+                        name="message"
+                        placeholder="Write your message..."
+                        required></textarea>
+
+                    <button type="submit" class="send-message-btn">
+                        Send Message
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <p class="empty-message">
+                    You don't have any accepted learning partners yet.
+                    Once a student accepts your learning request,
+                    you will be able to message them here.
+                </p>
+
+            {% endif %}
 
             <hr>
 
@@ -136,9 +190,17 @@
                     <div class="message-card">
 
                         {% if msg.sender_id == current_user_id %}
-                            <strong>You → Student #{{ msg.receiver_id }}</strong>
+
+                            <strong>
+                                You → Student #{{ msg.receiver_id }}
+                            </strong>
+
                         {% else %}
-                            <strong>Student #{{ msg.sender_id }} → You</strong>
+
+                            <strong>
+                                Student #{{ msg.sender_id }} → You
+                            </strong>
+
                         {% endif %}
 
                         <p>{{ msg.message }}</p>
@@ -153,7 +215,10 @@
 
             {% else %}
 
-                <p>No messages yet. Start a conversation!</p>
+                <p class="empty-message">
+                    No messages yet. Once a student accepts your
+                    learning request, you can start a conversation.
+                </p>
 
             {% endif %}
 
@@ -165,3 +230,4 @@
 
 </body>
 </html>
+```
