@@ -4,6 +4,12 @@ A web-based platform designed to connect students based on their skills, learnin
 
 The main goal of this project is to create a campus environment where students can find other students who can teach, learn, or collaborate with them on different skills.
 
+## 🌐 Live Demo
+
+🚀 **Live Website:** [Campus Skill Exchange Platform](https://priya19120.github.io/Campus-Skill-Exchange-Platform/)
+
+Click the link above to explore the live project.
+
 ## 🎯 Objectives
 
 * Connect students based on their skills and interests
