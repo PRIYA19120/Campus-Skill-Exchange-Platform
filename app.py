@@ -1,10 +1,12 @@
-from flask import( 
-    Flask, 
-    render_template, 
-    request, 
-    session, 
-    redirect, 
-    url_for,flash
+from flask import (
+    Flask,
+    render_template,
+    request,
+    session,
+    redirect,
+    url_for,
+    flash,
+    send_from_directory
 )
 
 
@@ -874,16 +876,12 @@ def learning_requests():
     if not student_id:
         return redirect(url_for("login"))
 
-    print("LOGGED-IN STUDENT ID:", student_id)
-
+    # Requests received by current student
     received_requests = LearningRequest.query.filter_by(
         partner_id=student_id
     ).order_by(
         LearningRequest.created_at.desc()
     ).all()
-
-    print("RECEIVED REQUEST COUNT:", len(received_requests))
-    print("RECEIVED REQUEST IDS:", [req.request_id for req in received_requests])
 
     incoming = []
 
@@ -900,11 +898,32 @@ def learning_requests():
             "created_at": req.created_at
         })
 
+    # Requests sent by current student
+    sent_requests = LearningRequest.query.filter_by(
+        student_id=student_id
+    ).order_by(
+        LearningRequest.created_at.desc()
+    ).all()
+
+    outgoing = []
+
+    for req in sent_requests:
+        partner = db.session.get(Student, req.partner_id)
+        skill = db.session.get(Skill, req.skill_id)
+
+        outgoing.append({
+            "request_id": req.request_id,
+            "partner_name": partner.name if partner else "Unknown student",
+            "skill_name": skill.skill_name if skill else "Unknown skill",
+            "status": req.status,
+            "created_at": req.created_at
+        })
+
     return render_template(
         "learning_requests.html",
-        incoming=incoming
+        incoming=incoming,
+        outgoing=outgoing
     )
-
 
 
 # Only the receiving student can accept or reject a request.
