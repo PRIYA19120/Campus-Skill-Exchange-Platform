@@ -99,3 +99,7 @@ The platform can be further extended with advanced recommendation systems, impro
 
 **Campus Skill Exchange Platform**
 *Connecting students through skills and peer learning.*
+
+## Getting Started
+
+Students can use this platform to share skills, discover learning partners, and collaborate with peers.
