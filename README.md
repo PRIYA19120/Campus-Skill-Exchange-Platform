@@ -116,3 +116,9 @@ The platform can be extended with real-time chat and additional skill categories
 2. Install Python dependencies using pip install -r requirements.txt.
 3. Configure the required environment variables.
 4. Start the Flask application using python app.py.
+
+## Contribution Guidelines
+
+- Keep code clean and readable.
+- Test changes before submitting.
+- Use meaningful commit messages.
