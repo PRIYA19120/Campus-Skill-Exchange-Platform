@@ -103,3 +103,6 @@ The platform can be further extended with advanced recommendation systems, impro
 ## Getting Started
 
 Students can use this platform to share skills, discover learning partners, and collaborate with peers.
+
+## Project Usage
+Run the Flask application locally and open it in your browser to explore the platform.
