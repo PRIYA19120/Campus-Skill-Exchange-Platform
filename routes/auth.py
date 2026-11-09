@@ -17,7 +17,6 @@ def register():
     name = data.get("name", "").strip()
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
-    hashed_password = generate_password_hash(password)
     department = data.get("department", "").strip()
     semester = data.get("semester")
 
@@ -115,3 +114,5 @@ def get_profile(student_id):
             "semester": student.semester
         }
     }, 200
+
+
