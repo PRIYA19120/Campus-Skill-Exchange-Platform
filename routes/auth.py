@@ -102,8 +102,7 @@ def login():
 
 @auth_bp.route("/profile/<int:student_id>", methods=["GET"])
 def get_profile(student_id):
-    student = Student.query.get(student_id)
-
+    student = db.session.get(Student, student_id)
     if not student:
         return {"error": "Student not found."}, 404
 
