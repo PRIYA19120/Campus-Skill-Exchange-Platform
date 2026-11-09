@@ -106,3 +106,6 @@ Students can use this platform to share skills, discover learning partners, and 
 
 ## Project Usage
 Run the Flask application locally and open it in your browser to explore the platform.
+
+## Future Enhancements
+The platform can be extended with real-time chat and additional skill categories.
