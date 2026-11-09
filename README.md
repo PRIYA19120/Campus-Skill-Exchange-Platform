@@ -109,3 +109,10 @@ Run the Flask application locally and open it in your browser to explore the pla
 
 ## Future Enhancements
 The platform can be extended with real-time chat and additional skill categories.
+
+## Local Setup
+
+1. Clone or download this repository.
+2. Install Python dependencies using pip install -r requirements.txt.
+3. Configure the required environment variables.
+4. Start the Flask application using python app.py.
