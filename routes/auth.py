@@ -24,7 +24,8 @@ def register():
     password = data.get("password", "")
     department = data.get("department", "").strip()
     semester = data.get("semester")
-
+    if not isinstance(password, str):
+        return {"error": "Password must be a string."}, 400
     if not name or not email or not password:
         return {
             "error": "Name, email, and password are required."
