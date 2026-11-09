@@ -12,7 +12,12 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return {
+            "error": "Request body must be a valid JSON object."
+        }, 400
 
     name = data.get("name", "").strip()
     email = data.get("email", "").strip().lower()
