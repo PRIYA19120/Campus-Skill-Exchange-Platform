@@ -32,6 +32,8 @@ def register():
     
    
 
+    hashed_password = generate_password_hash(password)
+
     try:
         student = Student(
             name=name,
@@ -114,5 +116,4 @@ def get_profile(student_id):
             "semester": student.semester
         }
     }, 200
-
 
